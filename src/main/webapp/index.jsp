@@ -42,7 +42,7 @@
 					<button id="openClickNear" type="button" class="btn btn-default btn-info">启用点击寻最近路段</button>
 					<button id="liangtiaolu" type="button" class="btn btn-default btn-info">两条路</button>
 					
-					<div>hehehe</div>
+					
 					<div style="text-align: center;margin-top:10px">
 						<div id="mapall" style="width: 100%; height: 650px"></div>
 					</div>
