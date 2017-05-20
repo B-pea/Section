@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.Section.dao.PubRoadSetionAreaMapper" >
+  <resultMap id="BaseResultMap" type="com.Section.model.PubRoadSetionArea" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="area_code" property="area_code" jdbcType="VARCHAR" />
+    <result column="ply_points" property="ply_points" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <insert id="insertSetionArea" parameterType="com.Section.model.PubRoadSetionArea">
+  	insert into pub_setion_area_points (area_code,ply_points)
+    values ( #{area_code,jdbcType=VARCHAR}, #{ply_points,jdbcType=VARCHAR})
+  </insert> 
+  
+ </mapper>

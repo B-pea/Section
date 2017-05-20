@@ -16,9 +16,10 @@
     <result column="stand_axle_load" property="stand_axle_load" jdbcType="INTEGER" />
     <result column="ROADRAILWAY_ID" property="roadRailway_id" jdbcType="VARCHAR" />
   	<result column="line_points" property="line_points" jdbcType="VARCHAR" />
+  	<result column="own_area" property="own_area" jdbcType="VARCHAR" />
   </resultMap>
   <sql id="Base_Column_List" >
-    ID, START_LONGTUDE, START_LATITUDE, END_LONGTUDE, END_LATITUDE, MILES,SETION_TYPE,sect_avg_speed,is_asphalt_road,ROAD_NUM,road_sect_limit,stand_axle_load,ROADRAILWAY_ID,line_points
+    ID, START_LONGTUDE, START_LATITUDE, END_LONGTUDE, END_LATITUDE, MILES,SETION_TYPE,sect_avg_speed,is_asphalt_road,ROAD_NUM,road_sect_limit,stand_axle_load,ROADRAILWAY_ID,line_points,own_area
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
@@ -155,6 +156,9 @@
       <if test="miles != null" >
         MILES = #{miles,jdbcType=DOUBLE},
       </if>
+      <if test="own_area != null" >
+        own_area = #{own_area,jdbcType=DOUBLE},
+      </if>
     </set>
     where ID = #{id,jdbcType=INTEGER}
   </update>
@@ -189,6 +193,12 @@
     <update id="updateLinePoint" parameterType="com.Section.model.PubRoadSetion" >
     update pub_road_setion
     set line_points = #{line_points,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=INTEGER}
+    </update>
+    
+    <update id="updateOwnArea" parameterType="com.Section.model.PubRoadSetion" >
+    update pub_road_setion
+    set own_area = #{own_area,jdbcType=VARCHAR}
     where ID = #{id,jdbcType=INTEGER}
     </update>
     
