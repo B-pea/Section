@@ -110,6 +110,11 @@ $("#luduanguishu").click(function (){
 	luduanguishu();
 })
 
+$("#guzhangzhandian").click(function (){
+	clear();
+	guzhangzhandian();
+})
+
 function clear(){
 	id_point_map.clear(); //
 	id_same_map.clear();	// id和与其重复的路段id列表
@@ -1299,6 +1304,37 @@ function updateOwnArea(setion_id,org_code){
 			org_code:org_code
 		},
 		type:'post'
+	})
+}
+
+/*******************************故障站点**********************************/
+
+// 故障站点
+function guzhangzhandian(){
+	$.ajax({
+		url:'data/siteOrgcode.json',
+		dataType:'json',
+		success:function(data){
+			var orderOne = [];
+			var orderTwo = [];
+			for(var i=0;i<data.length;i++){
+				orderOne.push(data[i].orderOne);
+				orderTwo.push(data[i].orderTwo);
+			}
+			var flag;
+			for(var i=0;i<orderTwo.length;i++){
+				flag = 0;
+				for(var j=0;j<orderOne.length;j++){
+					if(orderTwo[i] == orderOne[j]){
+						flag = 1;
+						break;
+					}
+				}
+				if(flag == 0){
+					console.log(orderTwo[i]);
+				}
+			}
+		}			
 	})
 }
 

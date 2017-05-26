@@ -43,6 +43,7 @@
 					<button id="liangtiaolu" type="button" class="btn btn-default btn-info">两条路</button>
 					<button id="quyuluduan" type="button" class="btn btn-default btn-info">区域路段</button>
 					<button id="luduanguishu" type="button" class="btn btn-default btn-info">路段归属市</button>
+					<button id="guzhangzhandian" type="button" class="btn btn-default btn-info">207or227</button>
 					
 					
 					<div style="text-align: center;margin-top:10px">
