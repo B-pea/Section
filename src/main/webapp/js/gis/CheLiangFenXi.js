@@ -115,6 +115,16 @@ $("#guzhangzhandian").click(function (){
 	guzhangzhandian();
 })
 
+$("#roadLinePoints").click(function (){
+	clear();
+	roadLinePoints();
+})
+
+$("#drawMyLine").click(function (){
+	clear();
+	drawMyLine();
+})
+
 function clear(){
 	id_point_map.clear(); //
 	id_same_map.clear();	// id和与其重复的路段id列表
@@ -1338,6 +1348,193 @@ function guzhangzhandian(){
 	})
 }
 
+/*******************************道路点集**********************************/
+
+var road_array_map = new Map();
+var road_policy_map = new Map();
+var G329_array_list = "121.014058,30.152932;121.304885,30.165958;121.5913,29.982304;121.611912,29.867824;121.779841,29.873524";
+setArray("G329",G329_array_list);
+setPolicy("G329",3);	// 1-时间最短；2-距离最短；3-不走高速；
+var G104_array_list = "120.087155,30.364116;120.113633,30.331477;120.301909,30.230602;120.421882,30.109394;120.8735,29.601323;120.597864,28.097771;120.630127,28.014175";
+setArray("G104",G104_array_list);
+var S101_array_list = "120.242509,30.280119;120.272431,30.310386;120.292616,30.356872;120.318056,30.384241;120.926488,30.540976";
+setArray("S101",S101_array_list);
+var S103_array_list = "120.250594,30.05421;120.163427,29.901844;120.123865,29.717273;120.072675,29.416557;120.004785,29.300159;119.871171,29.231364;119.783797,29.218929";
+setArray("S103",S103_array_list);120.131231,28.690686
+var S219_array_list = "120.13013,28.718744;120.130453,28.716328;120.131231,28.690686;120.105135,28.675416;120.104618,28.663884";
+setArray("S219",S219_array_list);
+var S322_array_list = "120.22571,28.759722;120.244067,28.80468;120.252026,28.785146";
+setArray("S322",S322_array_list);
+var S333_array_list = "120.229932,28.247071;120.3121,28.132614;120.374316,28.145005;120.485149,28.154632";
+setArray("S333",S333_array_list);
+
+setPolicy("G60",1);
+setPolicy("G25",1);
+
+var G15_array_list = "121.260234,29.058133;121.435655,30.047671";
+setArray("G15",G15_array_list);
+setPolicy("G15",1);
+
+//设置途径点
+function setArray(name,array_list){
+	var points = array_list.split(";");
+	var bmp_list = [];
+	for(var i=0;i<points.length;i++){
+		var bmp = new BMap.Point(points[i].split(",")[0],points[i].split(",")[1]);
+		bmp_list.push(bmp);
+	}
+	road_array_map.put(name,bmp_list);
+}
+
+// 设置策略
+function setPolicy(name,policy_num){
+	var routePolicy = [BMAP_DRIVING_POLICY_LEAST_TIME,BMAP_DRIVING_POLICY_LEAST_DISTANCE,BMAP_DRIVING_POLICY_AVOID_HIGHWAYS];
+	switch(policy_num){
+	case 1:road_policy_map.put(name,routePolicy[0]);break;
+	case 2:road_policy_map.put(name,routePolicy[1]);break;
+	case 3:road_policy_map.put(name,routePolicy[2]);break;
+	}	
+}
+
+//获取条道路的途经点
+function getArray(name){
+	var array = road_array_map.get(name);
+	if(array != null){
+		return array;
+	}else{
+		return "";
+	}
+}
+
+// 获取策略
+function getPolicy(name){
+	var policy = road_policy_map.get(name);
+	if(policy != null){
+		return policy;
+	}else{
+		return 2;
+	}
+}
+
+// 获取道路点集
+function roadLinePoints(){
+	$.ajax({
+		url:"road/getAllUser",
+		type:'post',
+		dataType:'json',
+		async:false,
+		success:function(data){
+			for(var i=0;i<data.length;i++){
+				
+				var sp = new BMap.Point(data[i].startLocation.split(",")[0],data[i].startLocation.split(",")[1]);
+				var ep = new BMap.Point(data[i].endLocation.split(",")[0],data[i].endLocation.split(",")[1]);
+				
+				var name = data[i].roadCode;
+				var policy = getPolicy(name);
+				var array = getArray(name);	
+				
+				drawRoad(sp,ep,"#000",6,data[i],array,policy); // 画出道路GIS
+				//drawRoadByValueLast(data[i],"green",7);
+			}
+		}
+	});
+}
+
+function drawMyLine(){
+	$.ajax({
+		url:"road/getAllUser",
+		type:'post',
+		dataType:'json',
+		async:false,
+		success:function(data){
+			for(var i=0;i<data.length;i++){
+				drawRoadByValueLast(data[i],"green",7);
+			}
+		}
+	});
+}
+
+//画出道路
+function drawRoad(sp,ep,color,weight,data,array,policyP){
+	var DrvUtil = new BMap.DrivingRoute('浙江', {
+		onSearchComplete : function(res) {
+			if (DrvUtil.getStatus() == BMAP_STATUS_SUCCESS) {
+				var plan = res.getPlan(0);
+				var all_points = "";
+				var arrPois = [];
+				for (var j = 0; j < plan.getNumRoutes(); j++) {
+					var route = plan.getRoute(j);
+					arrPois = arrPois.concat(route.getPath());
+					if(j == plan.getNumRoutes()-1 ){
+						
+						for(var k=1;k<arrPois.length;k=k+5){
+							var point_str = arrPois[k].lng+","+arrPois[k].lat+";";
+							if(arrPois[k].lng == '120.63013'){
+								console.log("zheli");
+							}
+							all_points += point_str;
+						}
+					}
+					
+					
+					var overlay = new BMap.Polyline(arrPois, {
+						strokeColor : color,
+						strokeWeight : weight,
+						strokeOpacity : 1
+					});
+					//map.addOverlay(overlay);
+				}
+				console.log(all_points);
+				all_points = all_points.substring(0,all_points.length-1);
+				$.ajax({
+					url:"road/updateRoadLinepoints",
+					type:'post',
+					dataType:'json',
+					async:false,
+					data:{
+						id:data.id,
+						line_points:all_points
+					}
+				})
+			}
+		},
+		policy : policyP
+	});
+	DrvUtil.disableAutoViewport();
+	DrvUtil.search(sp, ep,{
+		waypoints:array 
+	});		
+}
+
+//根据点集进行画线，路段
+function drawRoadByValueLast(data,color,weight){
+	var arrPois = [];
+	var point_arr_list = data.line_points.split(";");
+	for(var i=0;i<point_arr_list.length;i++){
+		var sp = point_arr_list[i].split(",")[0];
+		var ep = point_arr_list[i].split(",")[1];
+		var point = new BMap.Point(sp,ep);
+		//markerClick(sp,ep,point);
+		arrPois.push(point);
+	}
+	var overlay = new BMap.Polyline(arrPois, {
+		strokeColor : color,
+		strokeWeight : weight,
+		strokeOpacity : 1
+	});
+	overlay.addEventListener("click",function(){
+		alert(data.roadCode);
+	})
+	map.addOverlay(overlay);
+}
+
+function markerClick(sp,ep,point){
+	var marker = new BMap.Marker(point);
+	marker.addEventListener("click",function(e){
+		alert(sp+"_"+ep);
+	});
+	map.addOverlay(marker);
+}
 /*******************************工具函数**********************************/
 
 /**
@@ -1492,6 +1689,100 @@ function showRoadSetion(sid,s_point, e_point, color, weight) {
 	DrvUtil.search(s_point, e_point);
 }
 
+/**********************************************区域反选********************************/
+var blist = [];
+var districtLoading = 0;
+
+getBoundary();
+
+function getBoundary() {   
+    addDistrict("浙江省");
+}
+
+
+/**
+ * 添加行政区划
+ * @param {} districtName 行政区划名
+ * @returns  无返回值
+ */
+function addDistrict(districtName) {
+    //使用计数器来控制加载过程
+    districtLoading++;
+    var bdary = new BMap.Boundary();
+    bdary.get(districtName, function (rs) {       //获取行政区域
+        var count = rs.boundaries.length; //行政区域的点有多少个
+        if (count === 0) {
+            alert('未能获取当前输入行政区域');
+            return;
+        }
+        for (var i = 0; i < count; i++) {
+            blist.push({ points: rs.boundaries[i], name: districtName });
+        };
+        //加载完成区域点后计数器-1
+        districtLoading--;
+        if (districtLoading == 0) {
+            //全加载完成后画端点
+            drawBoundary();
+        }
+    });
+}
+
+function drawBoundary() {
+    //包含所有区域的点数组
+    var pointArray = [];
+
+    /*画遮蔽层的相关方法
+    *思路: 首先在中国地图最外画一圈，圈住理论上所有的中国领土，然后再将每个闭合区域合并进来，并全部连到西北角。
+    *      这样就做出了一个经过多次西北角的闭合多边形*/
+    //定义中国东南西北端点，作为第一层-27.189508,69.729742
+    var pNW = { lat: 59.0, lng: 73.0 }
+    var pNE = { lat: 59.0, lng: 136.0 }
+    var pSE = { lat: 3.0, lng: 136.0 }
+    var pSW = { lat: 3.0, lng: 73.0 }
+    //向数组中添加一次闭合多边形，并将西北角再加一次作为之后画闭合区域的起点
+    var pArray = [];
+    pArray.push(pSW);
+    pArray.push(pSE);
+    pArray.push(pNE);
+    pArray.push(pNW);
+    pArray.push(pSW);
+    //循环添加各闭合区域
+    for (var i = 0; i < blist.length; i++) {
+        //添加多边形层并显示
+		var ply = new BMap.Polygon(blist[i].points, {
+			strokeWeight : 5,
+			strokeColor : "#FF0000",
+			fillOpacity : 0.01,
+			fillColor : " #FFFFFF",
+			enableClicking : false,
+			enableMassClear : false
+		}); 
+		//建立多边形覆盖物
+		map.addOverlay(ply);
+
+        //将点增加到视野范围内
+        var path = ply.getPath();
+        pointArray = pointArray.concat(path);
+        //将闭合区域加到遮蔽层上，每次添加完后要再加一次西北角作为下次添加的起点和最后一次的终点
+        pArray = pArray.concat(path);
+        pArray.push(pArray[0]);
+    }
+
+	// 添加遮蔽层
+	var plyall = new BMap.Polygon(pArray, {
+		strokeOpacity : 0.0000001,
+		strokeColor : "#000000",
+		strokeWeight : 0.00001,
+		fillColor : "#000000",
+		fillOpacity : 0.4,
+		enableClicking : false,
+		enableMassClear : false
+	}); // 建立多边形覆盖物
+	map.addOverlay(plyall);
+}
+
+
+/****************************************************************************************/
 // 弧度
 function Rad(d){	
     return d * Math.PI / 180.0;

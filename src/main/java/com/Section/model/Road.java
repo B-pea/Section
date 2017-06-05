@@ -40,6 +40,8 @@ public class Road implements Serializable {
 
 	private String updateType;
 
+	private String line_points;
+	
 	public String getId() {
 		return id;
 	}
@@ -150,5 +152,13 @@ public class Road implements Serializable {
 
 	public void setSetTime1(String setTime1) {
 		this.setTime1 = setTime1;
+	}
+
+	public String getLine_points() {
+		return line_points;
+	}
+
+	public void setLine_points(String line_points) {
+		this.line_points = line_points;
 	}
 }

@@ -15,9 +15,9 @@
 		<result column="SET_TIME1" property="setTime1" jdbcType="VARCHAR" />
 		<result column="DESCRIRIBE" property="descriribe" jdbcType="VARCHAR" />
 		<result column="STATUS" property="status" jdbcType="CHAR" />
-		<result column="LAST_UPDATE_DATE" property="lastUpdateDate"
-			jdbcType="DATE" />
+		<result column="LAST_UPDATE_DATE" property="lastUpdateDate" jdbcType="DATE" />
 		<result column="UPDATE_TYPE" property="updateType" jdbcType="CHAR" />
+		<result column="line_points" property="line_points" jdbcType="VARCHAR" />
 	</resultMap>
 	<sql id="Base_Column_List">
 		ID,ROAD_CODE, NAME, AREA, START_LOCATION, END_LOCATION,
@@ -153,6 +153,9 @@
 			</if>
 			<if test="updateType != null">
 				UPDATE_TYPE = #{updateType,jdbcType=CHAR},
+			</if>
+			<if test="line_points != null">
+				line_points = #{line_points,jdbcType=CHAR},
 			</if>
 		</set>
 		where ID = #{id,jdbcType=VARCHAR}

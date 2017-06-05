@@ -44,6 +44,8 @@
 					<button id="quyuluduan" type="button" class="btn btn-default btn-info">区域路段</button>
 					<button id="luduanguishu" type="button" class="btn btn-default btn-info">路段归属市</button>
 					<button id="guzhangzhandian" type="button" class="btn btn-default btn-info">207or227</button>
+					<button id="roadLinePoints" type="button" class="btn btn-default btn-info">道路点集</button>
+					<button id="drawMyLine" type="button" class="btn btn-default btn-info">道路点集-画</button>
 					
 					
 					<div style="text-align: center;margin-top:10px">
@@ -77,6 +79,7 @@
 			</div>
 		</div>
 	</div>
+	<script type="text/javascript" src="http://api.map.baidu.com/library/AreaRestriction/1.2/src/AreaRestriction_min.js"></script>
 	<script type="text/javascript">	
     var map = new BMap.Map("mapall"); 
     map.enableScrollWheelZoom(true); //启用滚轮放大缩小
