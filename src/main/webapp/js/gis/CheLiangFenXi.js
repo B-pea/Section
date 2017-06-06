@@ -302,6 +302,15 @@ function apiGetLinePoint(url,id,num){
 			 var start1 = data.result.routes[0]
 			 var arr = data.result.routes[0].steps;
 			 var str = arr[0].path;
+			 var pointsList = str.split(";");
+			 if(pointsList.length>4){
+				 var strTemp = "";
+				 for(var i=0;i<pointsList.length;i=i+5){
+					 strTemp = strTemp + pointsList[i] + ";"
+				 }
+				 str = strTemp.substring(0,strTemp.length - 1);
+			 }
+			 
 			 updateLabel(id,str);			 
 		 }
 	});
@@ -1486,16 +1495,7 @@ function drawRoad(sp,ep,color,weight,data,array,policyP){
 				}
 				console.log(all_points);
 				all_points = all_points.substring(0,all_points.length-1);
-				$.ajax({
-					url:"road/updateRoadLinepoints",
-					type:'post',
-					dataType:'json',
-					async:false,
-					data:{
-						id:data.id,
-						line_points:all_points
-					}
-				})
+				updateRoadLinePoints(data,all_points);
 			}
 		},
 		policy : policyP
@@ -1504,6 +1504,22 @@ function drawRoad(sp,ep,color,weight,data,array,policyP){
 	DrvUtil.search(sp, ep,{
 		waypoints:array 
 	});		
+}
+
+function updateRoadLinePoints(data,all_points){
+	if(data.line_points != ""){
+		return;
+	}
+	$.ajax({
+		url:"road/updateRoadLinepoints",
+		type:'post',
+		dataType:'json',
+		async:false,
+		data:{
+			id:data.id,
+			line_points:all_points
+		}
+	})
 }
 
 //根据点集进行画线，路段

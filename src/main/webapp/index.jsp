@@ -37,7 +37,7 @@
 					<button id="updateSection" type="button" class="btn btn-default btn-info">更新路段属性</button>
 					<button id="updateRoute" type="button" class="btn btn-default btn-info">更新站点线路属性</button>
 					<button id="drawTwenty" type="button" class="btn btn-default btn-info">20站点归属</button>
-					<button id="updateLinePoint" type="button" class="btn btn-default btn-info">20站点更新点集</button>
+					<button id="updateLinePoint" type="button" class="btn btn-default btn-info">路段更新点集</button>
 					<button id="updateRailwayLinePoint" type="button" class="btn btn-default btn-info">54路线路段更新点集</button>
 					<button id="openClickNear" type="button" class="btn btn-default btn-info">启用点击寻最近路段</button>
 					<button id="liangtiaolu" type="button" class="btn btn-default btn-info">两条路</button>
