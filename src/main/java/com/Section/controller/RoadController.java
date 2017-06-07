@@ -229,19 +229,20 @@ public class RoadController {
 	
 	@RequestMapping("/updateRoadLinepoints")
 	@ResponseBody
-	public int updateRoadLinepoints(String id,String line_points,Float distance,HttpServletRequest request,HttpServletResponse response){
+	public String updateRoadLinepoints(String id,String line_points,String distance,HttpServletRequest request,HttpServletResponse response){
 		try {
 			Road road = new Road();
 			road.setId(id);
 			road.setLine_points(line_points);
-			road.setMiles(distance);
+			Float miles = Float.valueOf(distance);
+			road.setMiles(miles);
 			road.setLastUpdateDate(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 			roadService.updateRoad(road);
-			return 1;
+			return id;
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.println("错误信息" + e.getMessage());
-			return 0;
+			return "";
 		} finally {			
 			System.out.println("公路信息登记 :updRoad");
 		} 

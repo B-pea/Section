@@ -1384,6 +1384,8 @@ var G15_array_list = "121.260234,29.058133;121.435655,30.047671";
 setArray("G15",G15_array_list);
 setPolicy("G15",1);
 
+var S19_array_list = "121.139983,28.247202;121.610201,28.960349";
+setArray("S19",S19_array_list);
 setPolicy("S19",1);
 
 //设置途径点
@@ -1460,7 +1462,15 @@ function drawMyLine(){
 		async:false,
 		success:function(data){
 			for(var i=0;i<data.length;i++){
-				drawRoadByValueLast(data[i],"green",7);
+				if(data[i].line_points.indexOf("a")>0){
+					var point_array_list = data[i].line_points.split("a");
+					for(var j=0;j<point_array_list.length;j++){
+						var linePointsEach = point_array_list[j];
+						drawRoadByValueLast(data[i].roadCode,linePointsEach,"green",7);
+					}
+				}else{
+					drawRoadByValueLast(data[i].roadCode,data[i].line_points,"green",7);
+				}
 			}
 		}
 	});
@@ -1473,11 +1483,12 @@ function drawRoad(sp,ep,color,weight,data,array,policyP){
 			if (DrvUtil.getStatus() == BMAP_STATUS_SUCCESS) {
 				var plan = res.getPlan(0);
 				var all_points = "";
+				var distance = 0;
 				var arrPois = [];
 				for (var j = 0; j < plan.getNumRoutes(); j++) {
 					var route = plan.getRoute(j);
 					arrPois = arrPois.concat(route.getPath());
-					var distance = route.getDistance();
+					
 					if(j == plan.getNumRoutes()-1 ){
 						
 						for(var k=1;k<arrPois.length;k=k+5){
@@ -1489,6 +1500,7 @@ function drawRoad(sp,ep,color,weight,data,array,policyP){
 						}
 					}
 					
+					distance += parseFloat(route.getDistance().split("公里")[0]);
 					
 					var overlay = new BMap.Polyline(arrPois, {
 						strokeColor : color,
@@ -1521,14 +1533,17 @@ function updateRoadLinePoints(data,all_points,distance){
 			id:data.id,
 			line_points:all_points,
 			distance:distance
+		},
+		success:function(data){
+			alert("更新点集完成，路段id："+data.id);
 		}
 	})
 }
 
 //根据点集进行画线，路段
-function drawRoadByValueLast(data,color,weight){
+function drawRoadByValueLast(roadCode,linePoints,color,weight){
 	var arrPois = [];
-	var point_arr_list = data.line_points.split(";");
+	var point_arr_list = linePoints.split(";");
 	for(var i=0;i<point_arr_list.length;i++){
 		var sp = point_arr_list[i].split(",")[0];
 		var ep = point_arr_list[i].split(",")[1];
@@ -1542,7 +1557,7 @@ function drawRoadByValueLast(data,color,weight){
 		strokeOpacity : 1
 	});
 	overlay.addEventListener("click",function(){
-		alert(data.roadCode);
+		alert(roadCode);
 	})
 	map.addOverlay(overlay);
 }
