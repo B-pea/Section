@@ -193,6 +193,9 @@
     <update id="updateLinePoint" parameterType="com.Section.model.PubRoadSetion" >
     update pub_road_setion
     <set >
+      <if test="miles != null" >
+        MILES = #{miles,jdbcType=DOUBLE},
+      </if>
       <if test="line_points != null" >
         line_points = #{line_points,jdbcType=VARCHAR},
       </if>
@@ -207,9 +210,6 @@
       </if>
       <if test="endLatitude != null" >
         END_LATITUDE = #{endLatitude,jdbcType=VARCHAR},
-      </if>
-      <if test="miles != null" >
-        MILES = #{miles,jdbcType=DOUBLE},
       </if>
       <if test="own_area != null" >
         own_area = #{own_area,jdbcType=DOUBLE},
