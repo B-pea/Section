@@ -229,11 +229,12 @@ public class RoadController {
 	
 	@RequestMapping("/updateRoadLinepoints")
 	@ResponseBody
-	public int updateRoadLinepoints(String id,String line_points,HttpServletRequest request,HttpServletResponse response){
+	public int updateRoadLinepoints(String id,String line_points,Float distance,HttpServletRequest request,HttpServletResponse response){
 		try {
 			Road road = new Road();
 			road.setId(id);
 			road.setLine_points(line_points);
+			road.setMiles(distance);
 			road.setLastUpdateDate(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 			roadService.updateRoad(road);
 			return 1;

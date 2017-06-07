@@ -148,10 +148,11 @@ public class GetRoadRouteController {
 	
 	@RequestMapping(value = "/updateLinePoint", method = RequestMethod.POST)
 	@ResponseBody
-	public void updateLinePoint(int id,String line_points) throws Exception{
+	public void updateLinePoint(int id,String line_points,Double distance) throws Exception{
 		PubRoadSetion setion = new PubRoadSetion();
 		setion.setId(id);
 		setion.setLine_points(line_points);
+		setion.setMiles(distance);
 		pubRoadSetionService.updateLinePoint(setion);
 	}
 	

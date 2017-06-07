@@ -1384,6 +1384,8 @@ var G15_array_list = "121.260234,29.058133;121.435655,30.047671";
 setArray("G15",G15_array_list);
 setPolicy("G15",1);
 
+setPolicy("S19",1);
+
 //设置途径点
 function setArray(name,array_list){
 	var points = array_list.split(";");
@@ -1433,7 +1435,7 @@ function roadLinePoints(){
 		dataType:'json',
 		async:false,
 		success:function(data){
-			for(var i=0;i<data.length;i++){
+			for(var i=data.length-1;i>=0;i--){
 				
 				var sp = new BMap.Point(data[i].startLocation.split(",")[0],data[i].startLocation.split(",")[1]);
 				var ep = new BMap.Point(data[i].endLocation.split(",")[0],data[i].endLocation.split(",")[1]);
@@ -1441,8 +1443,9 @@ function roadLinePoints(){
 				var name = data[i].roadCode;
 				var policy = getPolicy(name);
 				var array = getArray(name);	
-				
-				drawRoad(sp,ep,"#000",6,data[i],array,policy); // 画出道路GIS
+				if(data[i].line_points == "" || typeof(data[i].line_points) == 'undefined'){
+					drawRoad(sp,ep,"#000",6,data[i],array,policy); // 画出道路GIS
+				}
 				//drawRoadByValueLast(data[i],"green",7);
 			}
 		}
@@ -1474,6 +1477,7 @@ function drawRoad(sp,ep,color,weight,data,array,policyP){
 				for (var j = 0; j < plan.getNumRoutes(); j++) {
 					var route = plan.getRoute(j);
 					arrPois = arrPois.concat(route.getPath());
+					var distance = route.getDistance();
 					if(j == plan.getNumRoutes()-1 ){
 						
 						for(var k=1;k<arrPois.length;k=k+5){
@@ -1495,7 +1499,7 @@ function drawRoad(sp,ep,color,weight,data,array,policyP){
 				}
 				console.log(all_points);
 				all_points = all_points.substring(0,all_points.length-1);
-				updateRoadLinePoints(data,all_points);
+				updateRoadLinePoints(data,all_points,distance);
 			}
 		},
 		policy : policyP
@@ -1506,10 +1510,8 @@ function drawRoad(sp,ep,color,weight,data,array,policyP){
 	});		
 }
 
-function updateRoadLinePoints(data,all_points){
-	if(data.line_points != ""){
-		return;
-	}
+function updateRoadLinePoints(data,all_points,distance){
+	
 	$.ajax({
 		url:"road/updateRoadLinepoints",
 		type:'post',
@@ -1517,7 +1519,8 @@ function updateRoadLinePoints(data,all_points){
 		async:false,
 		data:{
 			id:data.id,
-			line_points:all_points
+			line_points:all_points,
+			distance:distance
 		}
 	})
 }

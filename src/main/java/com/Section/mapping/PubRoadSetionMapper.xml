@@ -192,7 +192,29 @@
     
     <update id="updateLinePoint" parameterType="com.Section.model.PubRoadSetion" >
     update pub_road_setion
-    set line_points = #{line_points,jdbcType=VARCHAR}
+    <set >
+      <if test="line_points != null" >
+        line_points = #{line_points,jdbcType=VARCHAR},
+      </if>
+      <if test="startLongtude != null" >
+        START_LONGTUDE = #{startLongtude,jdbcType=VARCHAR},
+      </if>
+      <if test="startLatitude != null" >
+        START_LATITUDE = #{startLatitude,jdbcType=VARCHAR},
+      </if>
+      <if test="endLongtude != null" >
+        END_LONGTUDE = #{endLongtude,jdbcType=VARCHAR},
+      </if>
+      <if test="endLatitude != null" >
+        END_LATITUDE = #{endLatitude,jdbcType=VARCHAR},
+      </if>
+      <if test="miles != null" >
+        MILES = #{miles,jdbcType=DOUBLE},
+      </if>
+      <if test="own_area != null" >
+        own_area = #{own_area,jdbcType=DOUBLE},
+      </if>
+    </set>
     where ID = #{id,jdbcType=INTEGER}
     </update>
     
