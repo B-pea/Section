@@ -125,6 +125,12 @@ $("#drawMyLine").click(function (){
 	drawMyLine();
 })
 
+$("#createScreenData").click(function (){
+	clear();
+	createScreenData();
+})
+
+
 function clear(){
 	id_point_map.clear(); //
 	id_same_map.clear();	// id和与其重复的路段id列表
@@ -1815,7 +1821,23 @@ function drawBoundary() {
 	map.addOverlay(plyall);
 }
 
-
+/*************************************造大屏数据*******************************************/
+function createScreenData(){
+	var veh = "浙J22Q15,浙J6YF91,浙J5CK72,浙J1EK65,浙JUY907,浙BF2Z35,浙JT3028,浙JAQ266,浙J9HX81,浙J5PD29,浙J7T616,浙JT1517,鄂L33595,豫NHN830,浙JV997W,赣G3H080,浙JU386W,浙JT8895,沪DK8266,浙JT3916,浙JXS279,浙J1WM87,鄂L32919,浙J1X712,浙JT2525,浙J2611T,浙M6F429,浙YM0797,浙J90162,浙J6B785,浙J8842F,浙C21318,浙JJW542,浙JT2326,皖M73017,浙CF36R5,浙J71998,浙J822H7,浙J0WA51,皖G01877,浙B8U116,浙JE355A,浙C2G162,浙J18215,浙J3031M,浙JS255U,浙J5FP68,浙J92039,浙JQ117J";
+	var site = "齐平村检测站,界头村检测站,三岩村检测站,东山村检测站,中河检测站检测站,石桥立交桥检测站,复兴立交桥检测站,艮秋立交桥检测站,祥符洋桥检测站,半山互通检测站,彭埠大桥桥口,西兴大桥桥口,财主埭村检测站,东江嘴村检测站,金家岭村检测站,横街村检测站,绕城村检测站,岩上村检测站,夏坞村检测站,白堰村检测站,华汇村检测站,钱江新村检测站,傅家坂检测站,勤劳村检测站,顺溪村检测站,岛石村检测站,乐平村检测站,上肇村检测站,陈家坪检测站,潘家村检测站,黄弹村检测站,虎啸杏村检测站,齐家沙村检测站,塔岭村检测站,金牛村检测站,东庄村检测站,穆家桥检测站,余姚江大桥检测站,芝兰桥检测站,联丰立交桥检测站,大岭下村检测站,永福寺检测站,黄岭村检测站,高钱村检测站,望春山检测站,金塘大桥检测站,余严桥检测站,海屿村检测站,海口村检测站,桑洲村检测站,大徐镇检测站,竹屿村检测站,奉化服务区检测站,康岭村检测站,岐东村检测站,海星村检测站,上横江村检测站,河姆村检测站,南庙村检测站,沈蔡村检测站,岩门村检测站,石阶下村检测站,闪坑村检测站,北山下村检测站,龙湾公铁立交桥检测站,埭头村检测站,山根村检测站,鹤东村检测站,观音堂检测站,半溪村检测站,赤岩寨检测站,郭庄村检测站,墩头检测站,塘下村检测站,永丰村检测站,飞云江大桥检测站,大藏村检测站,卢家场检测站,民谊村检测站"
+	var weight = 0;
+	var vehList = veh.split(",");
+	var siteList = site.split(",");
+	var siteNum = siteList.length;
+	var str = "";
+	for(var i=0;i<vehList.length;i++){
+		weight = 75+parseInt(Math.random() * 20);
+		var siteTemp = siteList[parseInt(Math.random()*siteNum)];
+		str = str + vehList[i]+","+siteTemp+","+weight +".";
+	}
+	str = str.substring(0,str.length-1);
+	console.log(str);
+}
 /****************************************************************************************/
 // 弧度
 function Rad(d){	

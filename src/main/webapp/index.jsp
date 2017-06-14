@@ -46,6 +46,7 @@
 					<button id="guzhangzhandian" type="button" class="btn btn-default btn-info">207or227</button>
 					<button id="roadLinePoints" type="button" class="btn btn-default btn-info">道路点集</button>
 					<button id="drawMyLine" type="button" class="btn btn-default btn-info">道路点集-画</button>
+					<button id="createScreenData" type="button" class="btn btn-default btn-info">造大屏数据</button>
 					
 					
 					<div style="text-align: center;margin-top:10px">
