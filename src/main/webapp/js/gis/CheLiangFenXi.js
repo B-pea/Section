@@ -1045,7 +1045,13 @@ function mateRoadandSetion(arrPois,road_id){
 	num_mateEverypoint++;
 	for(var i=0,size = section_data.length;i<size;i++){	
 		if(section_data[i].RoadRailwayID == 0){	// 路段归属，先到先得，国省道优先
-		
+			
+			var minDistance = mactchPrimary(section_data[i].line_points,arrPois);
+			if(minDistance>1){
+				console.log(i+"---"+size+"---"+section_data[i].id+"我离得太远了："+minDistance+"公里");
+				continue;
+			}
+			
 			var points = section_data[i].line_points.split(";");
 			var ratio = sameRatio(points,arrPois,0.5);
 			var changeFlag = 0;
@@ -1060,6 +1066,20 @@ function mateRoadandSetion(arrPois,road_id){
 			}
 		}
 	}
+}
+
+function mactchPrimary(setion_points,route_points){
+	var firstSectionPoint = setion_points.split(";")[0];
+	var minDistance = 100;
+	for(var i=0,size_i=route_points.length;i<size_i;i++){
+		var route_lng = route_points[i].split(",")[0];
+		var route_lat = route_points[i].split(",")[1];
+		var dis = get_distance(firstSectionPoint.split(",")[1],firstSectionPoint.split(",")[0],route_lat,route_lng);
+		if(dis<minDistance){
+			minDistance = dis;
+		}
+	}
+	return minDistance;
 }
 
 function updateRoadToSetionID(road_id,setion_id){
@@ -1121,9 +1141,9 @@ function drawAllSetion(){
 			for(var i=0;i<data.length;i++){
 				var points = data[i].line_points;
 				if(data[i].own_area == null){
-					drawRoadByValue(points,"blue",6);
+					drawRoadByValue(points,"blue",6,data[i].id);
 				}else{
-					drawRoadByValue(points,"red",2);
+					drawRoadByValue(points,"red",2,data[i].id);
 				}				
 			}			
 		}
@@ -1758,7 +1778,7 @@ function showRoad(sp,ep,color,weight,name,id){
  * @param color -- 'black'
  * @param weight -- 4
  */
-function drawRoadByValue(point_arr,color,weight){
+function drawRoadByValue(point_arr,color,weight,id){
 	if(point_arr == null){
 		console.log("该路段无数据");
 		return;
@@ -1776,6 +1796,9 @@ function drawRoadByValue(point_arr,color,weight){
 		strokeWeight : weight,
 		strokeOpacity : 1
 	});
+	overlay.addEventListener("click",function(){
+		alert(id);
+	})
 	map.addOverlay(overlay);
 }
 
