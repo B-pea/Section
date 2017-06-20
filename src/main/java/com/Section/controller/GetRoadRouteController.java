@@ -57,6 +57,7 @@ public class GetRoadRouteController {
 			map.put("EndLongtude", route.getEndLongtude());
 			double dd = route.getMiles();
 			map.put("miles", Double.toString(dd));
+			map.put("RoadRailwayID", route.getRoadRailway_id());
 			map.put("line_points", route.getLine_points());
 			list.add(map);
 		}
@@ -363,6 +364,14 @@ public class GetRoadRouteController {
 		pubRoadSetionService.updateRailwayID(setion);
 	}
 	
+	@RequestMapping(value = "/updateRoadToSetionID", method = RequestMethod.POST)
+	@ResponseBody
+	public void updateRoadToSetionID(String road_id,Integer setion_id) throws Exception{
+		PubRoadSetion setion = new PubRoadSetion();
+		setion.setId(setion_id);
+		setion.setRoadRailway_id(road_id);	// 目前，当Railway_id是road_id,2017-6-19 21:25:51
+		pubRoadSetionService.updateRailwayID(setion);
+	}
 	
 	
 	/**

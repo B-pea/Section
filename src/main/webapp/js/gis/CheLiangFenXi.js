@@ -130,6 +130,17 @@ $("#createScreenData").click(function (){
 	createScreenData();
 })
 
+$("#matchRoad").click(function (){
+	clear();
+	matchRoad();
+})
+
+$("#showRoadSetionCompare").click(function (){
+	clear();
+	showRoadSetionCompare();
+})
+
+showCity("浙江省");
 
 function clear(){
 	id_point_map.clear(); //
@@ -263,7 +274,7 @@ function updateLinePoint(){
 		async:false,
 		success:function(data){
 			for(var i=0;i<data.length;i++){
-				if(data[i].line_points == null){
+				if(data[i].line_points == 0){
 					var id = data[i].id;
 					var start = data[i].StartLatitude+","+data[i].StartLongtude;
 					var end = data[i].EndLatitude+","+data[i].EndLongtude;
@@ -308,14 +319,23 @@ function apiGetLinePoint(url,id,num){
 			 var start1 = data.result.routes[0]
 			 var arr = data.result.routes[0].steps;
 			 var str = arr[0].path;
-			 var pointsList = str.split(";");
+			/* var pointsList = str.split(";");	// 精简五分之一，但是有路段断开的情况
 			 if(pointsList.length>4){
 				 var strTemp = "";
-				 for(var i=0;i<pointsList.length;i=i+5){
+				 for(var i=0;i<pointsList.length;i=i+5){	
 					 strTemp = strTemp + pointsList[i] + ";"
 				 }
 				 str = strTemp.substring(0,strTemp.length - 1);
+			 }*/
+			 
+			 var pointsList = str.split(";");
+			 str = "";
+			 for(var i=0;i<pointsList.length;i++){
+				 var tempLat = pointsList[i].split(",")[0];
+				 var tempLng = pointsList[i].split(",")[1];
+				 str+= tempLat.substring(0,10)+","+tempLng.substring(0,9)+";";
 			 }
+			 str = str.substring(0,str.length-1);
 			 
 			 updateLabel(id,str);			 
 		 }
@@ -887,7 +907,7 @@ function mateEverypoint(arrPois,railway_id){
 		var id = keys[i];
 		 var data = setion_id_line_map.get(id); // 获得该路段的所有点集，map中已存
 		 var points = data.split(";");
-		 var ratio = sameRatio(points,arrPois);
+		 var ratio = sameRatio(points,arrPois,0.2);
 		 if(ratio>0.5){
 			 updateRailwayID(railway_id,keys[i]);			 
 		 }	
@@ -930,7 +950,7 @@ function mateEverypoint(arrPois,railway_id){
 }
 
 // 将路段点集和路线点集进行匹配，返回重合度（0-1）
-function sameRatio(setion_points,route_points){
+function sameRatio(setion_points,route_points,distance){
 	// 总的路段点的数量
 	var num_setion = setion_points.length;
 	var num_same = 0;
@@ -942,7 +962,7 @@ function sameRatio(setion_points,route_points){
 			var route_lng = route_points[j].split(",")[0];
 			var route_lat = route_points[j].split(",")[1];
 			var dis = get_distance(setion_lat,setion_lng,route_lat,route_lng);
-			if(dis<0.1){
+			if(dis<distance){
 				num_same++;
 				break;
 			}
@@ -982,7 +1002,96 @@ function getSetionList(){
 	})
 }
 
-/*******************************画出已经匹配的路段**********************************/
+/*******************************匹配道路与路段**********************************/
+var section_data ; // 路段数据集合
+function matchRoad(){
+	// 所有路段的点集放入map：setion_id_line_map
+	getSetionDataList();
+	// 选出路线的每段的点集，与所有的路段的点集匹配
+	getRoadPoints();
+	// 匹配成功的，在pub_road_setion表增加所属G104线路路段ID（匹配内部实现）
+}
+
+function getSetionDataList(){
+	$.ajax({
+		url:'getroad/getroutInfo',
+		type:'post',
+		async:false,
+		dataType:'json',
+		success:function(data){
+			section_data = data;
+		}
+	})
+}
+
+function getRoadPoints(){
+	$.ajax({
+		url:'road/getAllUser',
+		type:'post',
+		async:false,
+		dataType:'json',
+		success:function(data){
+			for(var i=0;i<data.length;i++){
+				var line_point = data[i].line_points.split(";");
+				mateRoadandSetion(line_point,data[i].id);	// 匹配
+			}			
+		}
+	})
+}
+
+var num_mateEverypoint = 1;
+function mateRoadandSetion(arrPois,road_id){
+	console.log(num_mateEverypoint+"/40");
+	num_mateEverypoint++;
+	for(var i=0,size = section_data.length;i<size;i++){	
+		if(section_data[i].RoadRailwayID == 0){	// 路段归属，先到先得，国省道优先
+		
+			var points = section_data[i].line_points.split(";");
+			var ratio = sameRatio(points,arrPois,0.5);
+			var changeFlag = 0;
+			if(ratio>0.5){
+				updateRoadToSetionID(road_id,section_data[i].id);	
+				changeFlag = 1;
+			}	
+			if(changeFlag == 1){
+				console.log(i+"---"+size+"---"+section_data[i].id);
+			}else{
+				console.log(i+"---"+size);
+			}
+		}
+	}
+}
+
+function updateRoadToSetionID(road_id,setion_id){
+	$.ajax({
+		url:'getroad/updateRoadToSetionID',
+		type:'post',
+		async:false,
+		data:{
+			road_id:road_id,
+			setion_id:setion_id
+		}
+	})
+}
+
+/*******************************画出已经匹配的路段-道路**********************************/
+function showRoadSetionCompare(){
+	// 获取匹配的路段
+	$.ajax({
+		url:'getroad/getroutMated',
+		type:'post',
+		async:false,
+		dataType:'json',
+		success:function(data){
+			for(var i=0;i<data.length;i++){
+				var points = data[i].line_points;
+				drawRoadByValue(points,"black",2);
+			}
+		}
+	})	
+}
+
+/*******************************画出已经匹配的路段-路段**********************************/
 
 // 画匹配路段，利用点集
 function drawMate(){
@@ -1819,6 +1928,32 @@ function drawBoundary() {
 		enableMassClear : false
 	}); // 建立多边形覆盖物
 	map.addOverlay(plyall);
+}
+
+//显示城市
+function showCity(city_name){
+	var bdary = new BMap.Boundary();
+	bdary.get(city_name, function(rs){       //获取行政区域
+		var count = rs.boundaries.length; //行政区域的点有多少个
+		if (count === 0) {
+			console.log('未能获取当前选取的区域');
+			return ;
+		}
+      	var pointArray = [];
+		for (var i = 0; i < count; i++) {
+			var ply = new BMap.Polygon(rs.boundaries[i], 
+													{strokeWeight: 3
+													, strokeColor: 'black'
+													, strokeOpacity: 0.7
+													, fillColor: ""/*
+													, fillOpacity:0.1*/
+													, enableClicking:false
+													, enableMassClear:false }); //建立多边形覆盖物
+			map.addOverlay(ply);  //添加覆盖物
+			pointArray = pointArray.concat(ply.getPath());
+		}
+		map.setViewport(pointArray);    //调整视野  
+	});
 }
 
 /*************************************造大屏数据*******************************************/
