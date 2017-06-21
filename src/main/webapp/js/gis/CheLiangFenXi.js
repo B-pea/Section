@@ -170,9 +170,9 @@ function createRoute(){
 					var startorg = data[i].orgCode;
 					var endorg = data[j].orgCode;
 					morePolicy(start,end,startorg,endorg,'10');
-					//morePolicy(start,end,startorg,endorg,"11");
-					//morePolicy(start,end,startorg,endorg,"12");
-					//morePolicy(start,end,startorg,endorg,"13");
+					morePolicy(start,end,startorg,endorg,"11");
+					morePolicy(start,end,startorg,endorg,"12");
+					morePolicy(start,end,startorg,endorg,"13");
 				}				
 			}
 		}
@@ -442,7 +442,7 @@ function checkSame(){
 				
 			}
 			sql_kill_same();	// 将重复ID统一化
-			sql_kill_near();	// 将近似ID统一化
+			//sql_kill_near();	// 将近似ID统一化
 			
 			sql_kill_useless(same_list,near_list);	// 删除重复ID和近似ID(路段表)
 		}
@@ -512,7 +512,7 @@ function sql_kill_useless(same_list,near_list){
 			}
 		})		
 	}
-	for(var j=0,size=near_list.length;j<size;j++){
+/*	for(var j=0,size=near_list.length;j<size;j++){
 		console.log("路段表删除相似:"+j+"/"+size);
 		$.ajax({
 			url:"getroad/deleteSetionByID",
@@ -522,7 +522,7 @@ function sql_kill_useless(same_list,near_list){
 				id:near_list[j]+1
 			}
 		})
-	}
+	}*/
 }
 
 // 从pub_road_route的setions中找到不重复的路段id
@@ -1143,7 +1143,7 @@ function drawAllSetion(){
 				if(data[i].own_area == null){
 					drawRoadByValue(points,"blue",6,data[i].id);
 				}else{
-					drawRoadByValue(points,"red",2,data[i].id);
+					drawRoadByValue(points,"blue",2,data[i].id);
 				}				
 			}			
 		}
@@ -1596,15 +1596,24 @@ function drawMyLine(){
 		dataType:'json',
 		async:false,
 		success:function(data){
+			var color = '';
 			for(var i=0;i<data.length;i++){
+				
+				var countryOrHighway = Number(data[i].id);
+				if(countryOrHighway<=19){
+					color = "red"
+				}else{
+					color = "green"
+				}
+				
 				if(data[i].line_points.indexOf("a")>0){
 					var point_array_list = data[i].line_points.split("a");
 					for(var j=0;j<point_array_list.length;j++){
 						var linePointsEach = point_array_list[j];
-						drawRoadByValueLast(data[i].roadCode,linePointsEach,"green",7);
+						drawRoadByValueLast(data[i].roadCode,linePointsEach,color,10);
 					}
 				}else{
-					drawRoadByValueLast(data[i].roadCode,data[i].line_points,"green",7);
+					drawRoadByValueLast(data[i].roadCode,data[i].line_points,color,10);
 				}
 			}
 		}
