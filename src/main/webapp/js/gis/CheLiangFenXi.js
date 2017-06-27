@@ -140,6 +140,32 @@ $("#showRoadSetionCompare").click(function (){
 	showRoadSetionCompare();
 })
 
+$("#roadTryToDraw").click(function (){
+	clear();
+	roadTryToDraw();
+})
+
+$("#raodSsave").click(function (){
+	clear();
+	raodSsave();
+})
+
+$("#raodUpdate").click(function (){
+	clear();
+	raodUpdate();
+})
+
+$("#openCreateRoad").click(function (){
+	clear();
+	openCreateRoad();
+})
+
+$("#addPassPoint").click(function (){
+	clear();
+	addPassPoint();
+})
+
+
 showCity("浙江省");
 
 function clear(){
@@ -1035,6 +1061,7 @@ function getRoadPoints(){
 				var line_point = data[i].line_points.split(";");
 				mateRoadandSetion(line_point,data[i].id);	// 匹配
 			}			
+			alert("匹配完成")
 		}
 	})
 }
@@ -1563,6 +1590,18 @@ var S10N_array_list = "120.661779,28.099157;120.827494,28.029509;120.972916,28.0
 setArray("S10",S10N_array_list);
 setPolicy("S10",1);
 
+var S308N_array_list = "120.266134,29.727026;120.22005,29.739178;120.199264,29.708253";
+setArray("S308",S308N_array_list);
+
+var S3100N_array_list = "120.126438,29.357166;120.132744,29.39689;120.132255,29.381536;120.154277,29.304813;120.301711,29.269503;120.3537,29.273894";
+setArray("S3100",S3100N_array_list);
+
+var S210N_array_list = "119.939788,29.44783;119.880464,29.458115;119.879651,29.482331";
+setArray("S210",S210N_array_list);
+
+var S03N_array_list = "120.278283,30.07149;120.301603,30.133198;120.339386,30.180671";
+setArray("S03",S03N_array_list);
+
 //设置途径点
 function setArray(name,array_list){
 	var points = array_list.split(";");
@@ -1752,6 +1791,165 @@ function markerClick(sp,ep,point){
 	});
 	map.addOverlay(marker);
 }
+
+/*********************************自动添加道路*****************************/
+var resultLinePoints ;
+var resultMiles;
+
+function openCreateRoad(){
+	map.removeEventListener("rightclick",addPass);
+	$("#span_append").html("点击增加途经点");
+	if($("#openCreateRoad").text() == "开始拾点"){
+		map.addEventListener("click",getPointStart);
+		map.addEventListener("rightclick",getPointEnd);
+		$("#openCreateRoad").text("结束拾点");
+		$("#span_start").html("左键点击地图赋值");
+		$("#span_end").html("右键点击地图赋值");
+	}else if($("#openCreateRoad").text() == "结束拾点"){
+		map.removeEventListener("click",getPointStart);
+		map.removeEventListener("rightclick",getPointEnd);
+		$("#openCreateRoad").text("开始拾点");
+		$("#span_start").html("点击开始拾点");
+		$("#span_end").html("点击结束拾点");
+	}
+}
+
+function addPassPoint(){
+	if($("#openCreateRoad").text() == "结束拾点"){
+		map.removeEventListener("click",getPointStart);
+		map.removeEventListener("rightclick",getPointEnd);
+		$("#openCreateRoad").text("开始拾点");
+		$("#span_start").html("点击开始拾点");
+		$("#span_end").html("点击结束拾点");
+	}
+	if($("#addPassPoint").text() == "增加途经点"){
+		map.addEventListener("rightclick",addPass);
+		$("#span_append").html("右键点追加，输入';'间隔，2个及以上点有效");
+		$("#addPassPoint").text("停止增加");
+	}else if($("#addPassPoint").text() == "停止增加"){
+		map.removeEventListener("rightclick",addPass);
+		$("#span_append").html("点击增加途经点");
+		$("#addPassPoint").text("增加途经点");
+	}
+	
+}
+
+function getPointStart(e){
+	document.getElementById("ROAD_START").value = e.point.lng + "," + e.point.lat; 
+}
+function getPointEnd(e){
+	document.getElementById("ROAD_END").value = e.point.lng + "," + e.point.lat; 
+}
+
+function addPass(e){
+	document.getElementById("ROAD_PASS").value += e.point.lng + "," + e.point.lat; 
+}
+
+function roadTryToDraw(){
+	var startPoint = $("#ROAD_START").val();
+	var endPoint = $("#ROAD_END").val();
+	var policy = $("#ROAD_POLICY").val();
+	var passList = $("#ROAD_PASS").val().split(";");
+	var pass = [];
+	for(var i=0;i<passList.length;i++){
+		var bmp = new BMap.Point(passList[i].split(",")[0],passList[i].split(",")[1]);
+		pass.push(bmp);
+	}
+	if(pass.length == 1){
+		pass = "";
+	}
+	startPoint = new BMap.Point(startPoint.split(",")[0],startPoint.split(",")[1]);
+	endPoint = new BMap.Point(endPoint.split(",")[0],endPoint.split(",")[1]);
+	showThisTemp(startPoint,endPoint,policy,pass);
+}
+
+function showThisTemp(sp,ep,policyP,pass){
+	map.clearOverlays();
+	var DrvUtil = new BMap.DrivingRoute('浙江', {
+		onSearchComplete : function(res) {
+			if (DrvUtil.getStatus() == BMAP_STATUS_SUCCESS) {
+				var plan = res.getPlan(0);
+				var all_points = "";
+				var distance = 0;
+				var arrPois = [];
+				for (var j = 0; j < plan.getNumRoutes(); j++) {
+					var route = plan.getRoute(j);
+					arrPois = arrPois.concat(route.getPath());
+					if(j == plan.getNumRoutes()-1 ){
+						for(var k=1;k<arrPois.length;k=k+5){
+							var point_str = arrPois[k].lng+","+arrPois[k].lat+";";
+							all_points += point_str;
+						}
+					}
+					distance += parseFloat(route.getDistance().split("公里")[0]);
+					var overlay = new BMap.Polyline(arrPois, {
+						strokeColor : "green",
+						strokeWeight : 7,
+						strokeOpacity : 1
+					});
+					map.addOverlay(overlay);
+				}
+				console.log(all_points);
+				all_points = all_points.substring(0,all_points.length-1);
+				resultLinePoints = all_points;
+				resultMiles = distance;
+			}
+		},
+		policy : policyP
+	});
+	DrvUtil.disableAutoViewport();
+	DrvUtil.search(sp, ep,{
+		waypoints:pass 
+	});		
+}
+
+function raodSsave(){
+	var roadData = {};
+	roadData["name"] = $("#ROAD_NAME").val();
+	roadData["roadCode"] = $("#ROAD_CODE").val(); 
+	roadData["area"] = "浙江省"; 
+	roadData["startLocation"] = $("#ROAD_START").val();
+	roadData["endLocation"] = $("#ROAD_END").val();
+	roadData["type"] = $("#ROAD_TYPE").val();
+	roadData["miles"] = resultMiles;
+	roadData["descriribe"] = $("#ROAD_DESCRIPTION").val();
+	roadData["status"] = "1";
+	roadData["updateType"] = "A";
+	roadData["line_points"] = resultLinePoints;
+	
+	$.ajax({
+		url:"road/insertRoad",
+		type:"post",
+		dataType:'json',
+		data:roadData,
+		async:false,
+		success:function(data){
+			if(data == 1){
+				alert("保存成功")
+			}
+		}
+	})
+}
+
+function raodUpdate(){
+	var roadData = {};
+	roadData["roadCode"] = $("#ROAD_CODE").val(); 
+	roadData["line_points"] = resultLinePoints;
+	roadData["miles"] = resultMiles;
+	$.ajax({
+		url:"road/updateRoad",
+		type:"post",
+		dataType:'json',
+		data:roadData,
+		async:false,
+		success:function(data){
+			if(data == 1){
+				alert("更新成功")
+			}
+		}
+	})
+}
+
 /*******************************工具函数**********************************/
 
 /**

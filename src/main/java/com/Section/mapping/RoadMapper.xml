@@ -72,6 +72,9 @@
 			<if test="updateType != null">
 				UPDATE_TYPE,
 			</if>
+			<if test="line_points != null">
+				line_points,
+			</if>
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides=",">
 			<if test="id != null">
@@ -112,6 +115,9 @@
 			</if>
 			<if test="updateType != null">
 				#{updateType,jdbcType=CHAR},
+			</if>
+			<if test="line_points != null">
+				#{line_points,jdbcType=VARCHAR},
 			</if>
 		</trim>
 	</insert>
@@ -158,7 +164,14 @@
 				line_points = #{line_points,jdbcType=CHAR},
 			</if>
 		</set>
-		where ID = #{id,jdbcType=VARCHAR}
+		<where>
+			<if test="id != null">
+				and ID = #{id,jdbcType=VARCHAR}
+			</if>
+			<if test="roadCode != null">
+				and ROAD_CODE = #{roadCode,jdbcType=VARCHAR}
+			</if>
+		</where>
 	</update>
 	<select id="findById" resultMap="BaseResultMap">
 		SELECT * FROM pub_road where id
