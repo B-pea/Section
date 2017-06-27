@@ -1523,6 +1523,46 @@ var S19_array_list = "121.139983,28.247202;121.610201,28.960349";
 setArray("S19",S19_array_list);
 setPolicy("S19",1);
 
+var S230_array_list = "120.229294,27.991725;120.375089,27.633743;120.48232,27.588792";
+setArray("S230",S230_array_list);
+setPolicy("S230",3);
+
+setPolicy("S27",1);
+
+var S217_array_list = "120.23671,29.132066;120.215599,29.041236";
+setArray("S217",S217_array_list);
+
+var S218_array_list = "120.31475,29.187405;120.360159,29.190771;120.376302,29.168295";
+setArray("S218",S218_array_list);
+
+var S313_array_list = "119.486988,29.244412;119.481378,29.231069;119.486836,29.230249;119.510412,29.222515;119.629361,29.152906;119.641016,29.134034";
+setArray("S313",S313_array_list);
+
+setPolicy("S9",1);
+
+setPolicy("G15W",1);
+
+var S310_array_list = "120.304294,29.256009;120.350547,29.265061";
+setArray("S310",S310_array_list);
+
+var S211_array_list = "120.321218,29.633682;120.384701,29.418309";
+setArray("S211",S211_array_list);
+
+var S34_array_list = "121.431963,29.769232;121.429251,29.657405;121.429313,29.60281";
+setArray("S34",S34_array_list);
+
+setPolicy("S31",1);
+
+var G60N_array_list = "118.919758,29.225624;118.595487,29.166978;118.049506,29.096976";
+setArray("G60N",G60N_array_list);
+setPolicy("G60N",1);
+
+setPolicy("S32",1);
+
+var S10N_array_list = "120.661779,28.099157;120.827494,28.029509;120.972916,28.008964";
+setArray("S10",S10N_array_list);
+setPolicy("S10",1);
+
 //设置途径点
 function setArray(name,array_list){
 	var points = array_list.split(";");
@@ -1671,7 +1711,6 @@ function updateRoadLinePoints(data,all_points,distance){
 	$.ajax({
 		url:"road/updateRoadLinepoints",
 		type:'post',
-		dataType:'json',
 		async:false,
 		data:{
 			id:data.id,
@@ -1679,7 +1718,7 @@ function updateRoadLinePoints(data,all_points,distance){
 			distance:distance
 		},
 		success:function(data){
-			alert("更新点集完成，路段id："+data.id);
+			alert("更新点集完成，路段id："+data);
 		}
 	})
 }

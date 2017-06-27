@@ -180,6 +180,7 @@
 		<if test="_parameter != null and _parameter !=''">
 			and name like '%${_parameter}%'
 		</if>
+		order by type asc
 	</select>
 	<select id="getListByPage" resultMap="BaseResultMap"
 		parameterType="java.util.Map">
