@@ -54,7 +54,7 @@
 			<button type="button" class="btn btn-default btn-info" >道路点集保存</button><!-- id="roadLinePoints"  -->
 			<button type="button" class="btn btn-default btn-info" id="openCreateRoad" >开始拾点</button>
 			<button type="button" class="btn btn-default btn-info" id="addPassPoint" >增加途经点</button><br>
-			<span>道路编码</span><input class="input" id="ROAD_CODE"><span>例如:G104</span><br>
+			<span>道路编码</span><input class="input" id="ROAD_CODE" onchange="changeName(this.value)"><span>例如:G104</span><br>
 			<span>道路名称</span><input class="input" id="ROAD_NAME"><span>例如:104国道</span><br>
 			<span>道路起点</span><input class="input" id="ROAD_START"><span id="span_start">点击开始拾点</span><br>
 			<span>道路终点</span><input class="input" id="ROAD_END"><span id="span_end">点击结束拾点</span><br>
@@ -71,6 +71,7 @@
 			<button type="button" class="btn btn-default btn-info" id="drawMyLine" >全部道路</button>
 			<button type="button" class="btn btn-default btn-info" id="drawAllSetion" >全部路段</button>
 			<button type="button" class="btn btn-default btn-info" id="showRoadSetionCompare" >与道路匹配的路段</button>
+			<button type="button" class="btn btn-default btn-info" id="clearMap" >清</button>
 			
 			<div class="divid"></div>
 			<h3>匹配计算</h3>
@@ -107,6 +108,11 @@
     map.enableScrollWheelZoom(true); //启用滚轮放大缩小
     var point = new BMap.Point(120.252178,30.269275);
 	map.centerAndZoom(point,8);
+	
+	function changeName(name){
+		$("#ROAD_NAME").val(name);
+		$("#ROAD_DESCRIPTION").val("浙江省杭州市"+name);
+	}
 </script>
 	<script src="js/gis/CheLiangFenXi.js"></script>
 

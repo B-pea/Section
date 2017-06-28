@@ -165,8 +165,18 @@ $("#addPassPoint").click(function (){
 	addPassPoint();
 })
 
+$("#clearMap").click(function (){
+	clear();
+	clearMap();
+})
+
+
 
 showCity("浙江省");
+
+function clearMap(){
+	map.clearOverlays();
+}
 
 function clear(){
 	id_point_map.clear(); //
@@ -1876,7 +1886,7 @@ function showThisTemp(sp,ep,policyP,pass){
 					var route = plan.getRoute(j);
 					arrPois = arrPois.concat(route.getPath());
 					if(j == plan.getNumRoutes()-1 ){
-						for(var k=1;k<arrPois.length;k=k+5){
+						for(var k=1;k<arrPois.length;k++){
 							var point_str = arrPois[k].lng+","+arrPois[k].lat+";";
 							all_points += point_str;
 						}
