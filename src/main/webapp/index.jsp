@@ -98,7 +98,7 @@
 			<button type="button" class="btn btn-default btn-info" id="createScreenData" >造大屏数据</button><br>
 	</div>
 	
-	<div style="z-index:0;position:absolute;top:0px;left:30%;right:0px;height:100%;text-align: center;">
+	<div style="z-index:0;position:absolute;top:0px;left:30%;right:0px;height:638px;text-align: center;">
 		<div id="mapall" style="width: 100%;height:100%;z-index:0;"></div>
 	</div>
 				
@@ -111,7 +111,7 @@
 	
 	function changeName(name){
 		$("#ROAD_NAME").val(name);
-		$("#ROAD_DESCRIPTION").val("浙江省杭州市"+name);
+		$("#ROAD_DESCRIPTION").val("浙江省义乌市"+name);
 	}
 </script>
 	<script src="js/gis/CheLiangFenXi.js"></script>

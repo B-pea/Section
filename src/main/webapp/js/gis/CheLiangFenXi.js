@@ -1076,10 +1076,7 @@ function getRoadPoints(){
 	})
 }
 
-var num_mateEverypoint = 1;
 function mateRoadandSetion(arrPois,road_id){
-	console.log(num_mateEverypoint+"/40");
-	num_mateEverypoint++;
 	for(var i=0,size = section_data.length;i<size;i++){	
 		if(section_data[i].RoadRailwayID == 0){	// 路段归属，先到先得，国省道优先
 			
@@ -1090,7 +1087,7 @@ function mateRoadandSetion(arrPois,road_id){
 			}
 			
 			var points = section_data[i].line_points.split(";");
-			var ratio = sameRatio(points,arrPois,0.5);
+			var ratio = sameRatio(points,arrPois,0.9);
 			var changeFlag = 0;
 			if(ratio>0.5){
 				updateRoadToSetionID(road_id,section_data[i].id);	
@@ -1688,8 +1685,7 @@ function drawMyLine(){
 			var color = '';
 			for(var i=0;i<data.length;i++){
 				
-				var countryOrHighway = Number(data[i].id);
-				if(countryOrHighway<=19){
+				if(data[i].type == 2){
 					color = "red"
 				}else{
 					color = "green"
