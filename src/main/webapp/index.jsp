@@ -79,7 +79,13 @@
 			<button type="button" class="btn btn-default btn-info" id="matchRoad" >路段归属道路</button>
 			
 			<div class="divid"></div>
+			<h3>GPS</h3>
+			<button type="button" class="btn btn-default btn-info" id="gpsUpdataBdPoint" >更新为百度点</button><br>
+			<button type="button" class="btn btn-default btn-info" id="gpsDrawByVehPlate" >画出某车的线路</button><br>
+			
+			<div class="divid"></div>
 			<h3>其他</h3>
+			<button type="button" class="btn btn-default btn-info" id="updateSiteToRoad" >更新站点所在道路</button><br>
 			<button type="button" class="btn btn-default btn-info" id="drawSetion" >画路段</button><br>
 			<button type="button" class="btn btn-default btn-info" id="drawSetion2" >画路段2</button><br>
 			<button type="button" class="btn btn-default btn-info" id="changeColor" >换颜色</button><br>

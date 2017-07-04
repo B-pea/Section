@@ -45,4 +45,6 @@ public interface SiteService {
 
 	List<Site> getAllSite();
 
+	List<Site> getSiteNoRoad();
+
 }

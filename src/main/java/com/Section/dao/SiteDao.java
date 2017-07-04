@@ -46,4 +46,6 @@ public interface SiteDao {
 	 * @return
 	 */
 	List<String> getSiteStatus();
+
+	List<Site> getSiteNoRoad();
 }

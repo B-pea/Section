@@ -170,6 +170,20 @@ $("#clearMap").click(function (){
 	clearMap();
 })
 
+$("#gpsUpdataBdPoint").click(function (){
+	clear();
+	gpsUpdataBdPoint();
+})
+
+$("#gpsDrawByVehPlate").click(function (){
+	clear();
+	gpsDrawByVehPlate();
+})
+
+$("#updateSiteToRoad").click(function (){
+	clear();
+	updateSiteToRoad();
+})
 
 
 showCity("浙江省");
@@ -1956,6 +1970,139 @@ function raodUpdate(){
 	})
 }
 
+/*******************************GPS处理**********************************/
+
+function gpsUpdataBdPoint(){
+	$.ajax({
+		url:"test_gps/getAlltest_gps",
+		type:'post',
+		dataType:'json',
+		async:false,
+		success:function(data){
+			for(var i=0,size_i=data.length;i<size_i;i++){
+				var id = data[i].id;
+				var coords = data[i].wgsLng+","+data[i].wgsLat;
+				var url = "http://api.map.baidu.com/geoconv/v1/?coords="+coords + "&from=1&to=5&ak=ZUONbpqGBsYGXNIYHicvbAbM";
+				setTimeout(function(){updataTest_gps(id,url);},i*20);
+			}
+			console.log("send done")
+		}
+	})
+}
+
+var doneFlag = 1;
+function updataTest_gps(id,url){
+	var date = new Date();
+	console.log(date)
+	$.ajax({
+		url:url,
+		dataType:"jsonp",
+		async:false,
+		success:function(data){
+			var lng = data.result[0].x;
+			var lat = data.result[0].y;
+			$.ajax({
+				url:"test_gps/updateByPrimaryKeySelective",
+				data:{
+					bdLng:lng,
+					bdLat:lat,
+					id:id
+				},
+				type:"post",
+				success:function(data){
+					console.log(doneFlag);
+					doneFlag++;
+				}
+			})
+		}
+	})
+}
+
+function gpsDrawByVehPlate(){
+	$.ajax({
+		url:'test_gps/selectBySomething',
+		data:{
+			vehPlate:'A80002'
+		},
+		dataType:'json',
+		success:function(data){
+			var pointList = [];
+			for(var i=0,size_i =data.length;i<size_i;i++){
+				var bPoint = new BMap.Point(data[i].bdLng,data[i].bdLat);
+				pointList.push(bPoint);
+			}
+			map.setViewport(pointList);
+			var overlay = new BMap.Polyline(pointList, {
+				strokeColor : 'green',
+				strokeWeight : 6,
+				strokeOpacity : 1
+			});
+			overlay.addEventListener("click",function(e){
+				alert('A80002');
+			});
+			map.addOverlay(overlay);
+		}
+	})
+}
+
+/************************************更新站点所在道路********************************************/
+
+function updateSiteToRoad(){
+	var roadData;
+	// 取出所有路段
+	$.ajax({
+		url:'road/getAllUser',
+		type:'post',
+		async:false,
+		dataType:'json',
+		success:function(data){
+			roadData = data;
+		}
+	})
+	$.ajax({
+		url:"site/getSiteNoRoad",
+		async:false,
+		type:"post",
+		dataType:"json",
+		success:function(data){
+			var road_id;
+			var section_id;
+			var dis;
+			for(var i=0;i<data.length;i++){
+				road_id = 0;
+				section_id = data[i].id;
+				dis = 100;
+				for(var j=0;j<roadData.length;j++){
+					var point_list = roadData[j].line_points.split(";");
+					for(var k=0;k<point_list.length;k++){
+						var tempDis = get_distance(data[i].latitude,data[i].longitude,point_list[k].split(",")[1],point_list[k].split(",")[0]);
+						if(dis > tempDis){
+							dis = tempDis;
+							road_id = roadData[j].id;
+						}
+					}
+				}
+				console.log(section_id+"__"+road_id+"__"+dis);
+				
+				updateSiteOwnRoad(section_id,road_id);
+			}
+		}
+	})
+}
+
+function updateSiteOwnRoad(section_id,road_id){
+	$.ajax({
+		url:"site/updateSite",
+		data:{
+			id:section_id,
+			road_id:road_id
+		},
+		async:false
+	})
+}
+
+
+
 /*******************************工具函数**********************************/
 
 /**
@@ -2248,6 +2395,8 @@ function createScreenData(){
 	str = str.substring(0,str.length-1);
 	console.log(str);
 }
+
+
 /****************************************************************************************/
 // 弧度
 function Rad(d){	

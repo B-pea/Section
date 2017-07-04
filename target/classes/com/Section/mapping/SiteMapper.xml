@@ -61,6 +61,12 @@
   	select NAME from pub_site_info where STATUS = 0
   </select>
   
+  <select id="getSiteNoRoad" resultMap="siteResultMap" >
+	select *
+	from pub_site_info 
+	where road_id is null or road_id = '0'
+  </select>
+  
   <insert id="addSite" parameterType="com.Section.model.Site">
       insert into pub_site_info
     <trim prefix="(" suffix=")" suffixOverrides="," >
