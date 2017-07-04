@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.Section.dao.test_gpsMapper" >
+  <resultMap id="BaseResultMap" type="com.Section.model.test_gps" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="veh_plate" property="vehPlate" jdbcType="VARCHAR" />
+    <result column="insert_time" property="insertTime" jdbcType="TIMESTAMP" />
+    <result column="wgs_lng" property="wgsLng" jdbcType="VARCHAR" />
+    <result column="wgs_lat" property="wgsLat" jdbcType="VARCHAR" />
+    <result column="speed" property="speed" jdbcType="DOUBLE" />
+    <result column="direction" property="direction" jdbcType="VARCHAR" />
+    <result column="car_status" property="carStatus" jdbcType="VARCHAR" />
+    <result column="bd_lng" property="bdLng" jdbcType="VARCHAR" />
+    <result column="bd_lat" property="bdLat" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, veh_plate, insert_time, wgs_lng, wgs_lat, speed, direction, car_status, bd_lng, 
+    bd_lat
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from test_gps
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  
+	 <select id="selectBySomething" resultMap="BaseResultMap" parameterType="com.Section.model.test_gps" >
+	  select 
+	  <include refid="Base_Column_List" />
+	  from test_gps
+	  <where>
+	  	<if test="id != null">
+			and id = #{id,jdbcType=VARCHAR}
+		</if>
+		<if test="vehPlate != null">
+			and veh_plate = #{vehPlate,jdbcType=VARCHAR}
+		</if>
+	  </where>
+	</select>
+  
+  <select id="getAlltest_gps" resultMap="BaseResultMap" >
+    select 
+    <include refid="Base_Column_List" />
+    from test_gps  
+    where bd_lng is null
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from test_gps
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.Section.model.test_gps" >
+    insert into test_gps (id, veh_plate, insert_time, 
+      wgs_lng, wgs_lat, speed, 
+      direction, car_status, bd_lng, 
+      bd_lat)
+    values (#{id,jdbcType=INTEGER}, #{vehPlate,jdbcType=VARCHAR}, #{insertTime,jdbcType=TIMESTAMP}, 
+      #{wgsLng,jdbcType=VARCHAR}, #{wgsLat,jdbcType=VARCHAR}, #{speed,jdbcType=DOUBLE}, 
+      #{direction,jdbcType=VARCHAR}, #{carStatus,jdbcType=VARCHAR}, #{bdLng,jdbcType=VARCHAR}, 
+      #{bdLat,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.Section.model.test_gps" >
+    insert into test_gps
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="vehPlate != null" >
+        veh_plate,
+      </if>
+      <if test="insertTime != null" >
+        insert_time,
+      </if>
+      <if test="wgsLng != null" >
+        wgs_lng,
+      </if>
+      <if test="wgsLat != null" >
+        wgs_lat,
+      </if>
+      <if test="speed != null" >
+        speed,
+      </if>
+      <if test="direction != null" >
+        direction,
+      </if>
+      <if test="carStatus != null" >
+        car_status,
+      </if>
+      <if test="bdLng != null" >
+        bd_lng,
+      </if>
+      <if test="bdLat != null" >
+        bd_lat,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="vehPlate != null" >
+        #{vehPlate,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null" >
+        #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="wgsLng != null" >
+        #{wgsLng,jdbcType=VARCHAR},
+      </if>
+      <if test="wgsLat != null" >
+        #{wgsLat,jdbcType=VARCHAR},
+      </if>
+      <if test="speed != null" >
+        #{speed,jdbcType=DOUBLE},
+      </if>
+      <if test="direction != null" >
+        #{direction,jdbcType=VARCHAR},
+      </if>
+      <if test="carStatus != null" >
+        #{carStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="bdLng != null" >
+        #{bdLng,jdbcType=VARCHAR},
+      </if>
+      <if test="bdLat != null" >
+        #{bdLat,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.Section.model.test_gps" >
+    update test_gps
+    <set >
+      <if test="vehPlate != null" >
+        veh_plate = #{vehPlate,jdbcType=VARCHAR},
+      </if>
+      <if test="insertTime != null" >
+        insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="wgsLng != null" >
+        wgs_lng = #{wgsLng,jdbcType=VARCHAR},
+      </if>
+      <if test="wgsLat != null" >
+        wgs_lat = #{wgsLat,jdbcType=VARCHAR},
+      </if>
+      <if test="speed != null" >
+        speed = #{speed,jdbcType=DOUBLE},
+      </if>
+      <if test="direction != null" >
+        direction = #{direction,jdbcType=VARCHAR},
+      </if>
+      <if test="carStatus != null" >
+        car_status = #{carStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="bdLng != null" >
+        bd_lng = #{bdLng,jdbcType=VARCHAR},
+      </if>
+      <if test="bdLat != null" >
+        bd_lat = #{bdLat,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.Section.model.test_gps" >
+    update test_gps
+    set veh_plate = #{vehPlate,jdbcType=VARCHAR},
+      insert_time = #{insertTime,jdbcType=TIMESTAMP},
+      wgs_lng = #{wgsLng,jdbcType=VARCHAR},
+      wgs_lat = #{wgsLat,jdbcType=VARCHAR},
+      speed = #{speed,jdbcType=DOUBLE},
+      direction = #{direction,jdbcType=VARCHAR},
+      car_status = #{carStatus,jdbcType=VARCHAR},
+      bd_lng = #{bdLng,jdbcType=VARCHAR},
+      bd_lat = #{bdLat,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
