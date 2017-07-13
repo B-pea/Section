@@ -1983,11 +1983,15 @@ function gpsUpdataBdPoint(){
 				var id = data[i].id;
 				var coords = data[i].wgsLng+","+data[i].wgsLat;
 				var url = "http://api.map.baidu.com/geoconv/v1/?coords="+coords + "&from=1&to=5&ak=ZUONbpqGBsYGXNIYHicvbAbM";
-				setTimeout(function(){updataTest_gps(id,url);},i*20);
+				setF(id,url,i);
 			}
 			console.log("send done")
 		}
 	})
+}
+
+function setF(id,url,i){
+	setTimeout(function(){updataTest_gps(id,url);},i*20);
 }
 
 var doneFlag = 1;
