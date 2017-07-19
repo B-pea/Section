@@ -49,6 +49,13 @@
 			<button type="button" class="btn btn-default btn-info" id="clearRoute" >清理重复路线</button>
 			
 			<div class="divid"></div>
+			<h3>GPS在线</h3>
+			<button type="button" class="btn btn-default btn-info" id="getPersonTail" >获取人员轨迹</button><br>
+			<span>人员轨迹点</span><input class="input" id="tailPointList" ><br>
+			<span>人员编码啊</span><input class="input" id="personName" ><br>
+			<button type="button" class="btn btn-default btn-info" id="savePersonTail" >保存人员轨迹</button><br>
+			<button type="button" class="btn btn-default btn-info" id="showPersonTail" >轨迹展示</button><br>
+			<div class="divid"></div>
 			<h3>点集保存</h3>
 			<button type="button" class="btn btn-default btn-info" id="updateLinePoint" >路段点集保存</button><br>
 			<button type="button" class="btn btn-default btn-info" >道路点集保存</button><!-- id="roadLinePoints"  -->

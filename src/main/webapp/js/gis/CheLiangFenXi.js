@@ -185,12 +185,29 @@ $("#updateSiteToRoad").click(function (){
 	updateSiteToRoad();
 })
 
+$("#getPersonTail").click(function (){
+	clear();
+	getPersonTail();
+})
+
+$("#savePersonTail").click(function (){
+	clear();
+	savePersonTail();
+})
+
+$("#showPersonTail").click(function (){
+	clear();
+	showPersonTail();
+})
+
+
 
 showCity("浙江省");
 
 function clearMap(){
 	map.clearOverlays();
 }
+
 
 function clear(){
 	id_point_map.clear(); //
@@ -2105,7 +2122,82 @@ function updateSiteOwnRoad(section_id,road_id){
 	})
 }
 
+/*******************************获取人员轨迹**********************************/
 
+function getPersonTail(){
+	map.addEventListener("click",getPersionTailPoint);
+}
+
+function getPersionTailPoint(e){
+	var tailPointList = $("#tailPointList").val();
+	tailPointList = tailPointList + e.point.lng + "," + e.point.lat+";";
+	$("#tailPointList").val(tailPointList);
+}
+
+function savePersonTail(){
+	var tailPointList = $("#tailPointList").val().substring(0,$("#tailPointList").val().length-1);
+	var personName = $("#personName").val();
+	$.ajax({
+		url:"walker/insertSelective",
+		data:{
+			walkerName:personName,
+			walkerPoints:tailPointList
+		},
+		type:'post',
+		success:function(data){
+			if(data=="1"){
+				alert("完成保存")
+			}
+		}
+	})
+}
+
+function showPersonTail(){
+	var id_points_map = new Map();
+	$.ajax({
+		url:"walker/getPersonTail",
+		dataType:'json',
+		type:'post',
+		success:function(data){
+			var a=0;
+			var pointSize = data.walker[0].walkerPoints.split(";").length;
+			// 将同时间的点放入一个索引内
+			for(var i=0;i<pointSize;i++){
+				var points = "";
+				for(var j=0;j<data.walker.length;j++){
+					points += data.walker[j].walkerPoints.split(";")[i]+";";
+				}
+				points = points.substring(0,points.length-1);
+				id_points_map.put(i,points);
+			}
+			// 间隔时间显示
+			window.setInterval(function() 
+					{ 
+				showGisPersonTail (id_points_map); 
+					}, 1000); 
+		}
+	})
+}
+
+var flagPersonTail = -1;
+function showGisPersonTail(data_map){
+	map.clearOverlays();
+	flagPersonTail++;
+	var data = data_map.get(flagPersonTail);
+	if(data == undefined){
+		flagPersonTail = 0;
+		data = data_map.get(flagPersonTail);
+	}
+	var pointList = data.split(";");
+	for(var i=0;i<pointList.length;i++){
+		var point = new BMap.Point(pointList[i].split(",")[0],pointList[i].split(",")[1]);
+		var marker = new BMap.Marker(point);
+		map.addOverlay(marker);
+		marker.setAnimation(BMAP_ANIMATION_BOUNCE);
+	}
+	
+	
+}
 
 /*******************************工具函数**********************************/
 
