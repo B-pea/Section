@@ -11,6 +11,8 @@ var sid_elng_map = new Map();
 var sid_elat_map = new Map();
 var sid_dis_map = new Map();	// setionID所在路段和点击点的最近距离 
 var g_dis_list_num = 0; // 点击点与路段计算距离的次数，用于判断计算完毕
+var icon_blue = new BMap.Symbol(BMap_Symbol_SHAPE_POINT, {scale: 0.7,fillColor: "#00baff",fillOpacity: 1});
+var icon_red = new BMap.Symbol(BMap_Symbol_SHAPE_POINT, {scale: 0.7,fillColor: "#ec6941",fillOpacity: 1});
 
 var div = $("#divv");
 
@@ -200,6 +202,10 @@ $("#showPersonTail").click(function (){
 	showPersonTail();
 })
 
+$("#showAreaByName").click(function(){
+	clear();
+	showAreaByName();
+})
 
 
 showCity("浙江省");
@@ -1534,6 +1540,7 @@ function guzhangzhandian(){
 		url:'data/siteOrgcode.json',
 		dataType:'json',
 		success:function(data){
+			var str="";
 			var orderOne = [];
 			var orderTwo = [];
 			for(var i=0;i<data.length;i++){
@@ -1550,9 +1557,10 @@ function guzhangzhandian(){
 					}
 				}
 				if(flag == 0){
-					console.log(orderTwo[i]);
+					str += "'"+orderTwo[i]+"',";
 				}
 			}
+			console.log(str);
 		}			
 	})
 }
@@ -2126,12 +2134,16 @@ function updateSiteOwnRoad(section_id,road_id){
 
 function getPersonTail(){
 	map.addEventListener("click",getPersionTailPoint);
+	$("#getPersonTail").html("正在获取")
 }
 
+var tailFlag = 0;
 function getPersionTailPoint(e){
 	var tailPointList = $("#tailPointList").val();
 	tailPointList = tailPointList + e.point.lng + "," + e.point.lat+";";
 	$("#tailPointList").val(tailPointList);
+	tailFlag++;
+	$("#tailNum").html(tailFlag+"");
 }
 
 function savePersonTail(){
@@ -2146,7 +2158,11 @@ function savePersonTail(){
 		type:'post',
 		success:function(data){
 			if(data=="1"){
-				alert("完成保存")
+				alert("完成保存");
+				$("#tailPointList").val("");
+				$("#personName").val("");
+				tailFlag = 0;
+				$("#tailNum").html(tailFlag+"");
 			}
 		}
 	})
@@ -2193,10 +2209,89 @@ function showGisPersonTail(data_map){
 		var point = new BMap.Point(pointList[i].split(",")[0],pointList[i].split(",")[1]);
 		var marker = new BMap.Marker(point);
 		map.addOverlay(marker);
-		marker.setAnimation(BMAP_ANIMATION_BOUNCE);
+		//marker.setAnimation(BMAP_ANIMATION_BOUNCE);
 	}
-	
-	
+}
+
+function showAreaByName(){
+	showArea($("#areaName").val(),"black","black",1);
+}
+/**
+ * 展示区域轮廓
+ * @param name
+ * @param strokeColor
+ * @param fillColor
+ * @param moveFlag 1调整视野
+ */
+function showArea(name,strokeColor,fillColor,moveFlag){
+	if(name != "浙江省"){
+		name = "浙江省" + name;
+	}
+	var strokeWeight = 3;
+	if(moveFlag == 1){
+		strokeWeight = 5;
+	}
+	var bdary = new BMap.Boundary();
+	bdary.get(name, function(rs){       //获取行政区域
+		//map.clearOverlays();        //清除地图覆盖物       
+		var count = rs.boundaries.length; //行政区域的点有多少个
+		if (count === 0) {
+			alert('未能获取当前选取的区域');
+			return ;
+		}
+      	var pointArray = [];
+		for (var i = 0; i < count; i++) {
+			var ply = new BMap.Polygon(rs.boundaries[i], 
+													{strokeWeight: strokeWeight
+													, strokeColor: strokeColor
+													, fillColor : ""
+													, enableClicking:false
+													, enableMassClear : false}); //建立多边形覆盖物
+			map.addOverlay(ply);  //添加覆盖物
+			pointArray = pointArray.concat(ply.getPath());
+		}
+		if(moveFlag == 1){
+			map.setViewport(pointArray);    //调整视野  
+			//map.setZoom(map.getZoom()+1);
+		}
+		
+	});   
+}
+
+/**
+ * 根据区域编码，显示区域内的所有站点
+ * @param orgcode
+ */
+function getSite(orgcode){
+	$.ajax({
+		type : "POST",
+		dataType : 'json',
+		data : {
+			name : orgcode
+		},
+		async : false, // 同步查询
+		url : 'site/getAllSite',
+		success : function(data){
+			point_view = [];
+			for(var i=0;i<data.length;i++){
+				var myIcon;
+				if(data[i].status == 1){
+					myIcon = icon_blue;
+				}else{
+					myIcon = icon_red;
+				}
+				var point = new BMap.Point(data[i].longitude,data[i].latitude);// 当前点
+				var marker = new BMap.Marker(point,{icon:myIcon}, {imageOffset: new BMap.Size(0, 0)});  // 创建标注
+				marker.setTitle(data[i].name);	//	添加标题
+				map.addOverlay(marker);// 标注加入到地图中
+				point_view.push(point);// 调整视野
+			}
+		},
+		error : function(){
+			alert("获取站点信息失败");
+		}
+	});
+	map.setViewport(point_view);
 }
 
 /*******************************工具函数**********************************/

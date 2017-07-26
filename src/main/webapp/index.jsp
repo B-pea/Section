@@ -36,6 +36,11 @@
 	}
 	.input{
 		width:150px;
+		display:inline_block;
+	}
+	.text100{
+		width:100px;
+		display:inline_block;
 	}
 </style>
 </head>
@@ -51,10 +56,14 @@
 			<div class="divid"></div>
 			<h3>GPS在线</h3>
 			<button type="button" class="btn btn-default btn-info" id="getPersonTail" >获取人员轨迹</button><br>
-			<span>人员轨迹点</span><input class="input" id="tailPointList" ><br>
-			<span>人员编码啊</span><input class="input" id="personName" ><br>
+			<button type="button" class="btn btn-default btn-info" id="showAreaByName" >显示区域</button><br>
+			<div class="text"><span >区域轮廓</span></div><input class="input" id="areaName" ><br>
+			<div class="text"><span ><span >人员轨迹点</span></div><input class="input" id="tailPointList" ><span id="tailNum">0</span><br>
+			<div class="text"><span ><span >巡查范围</span></div><input class="input" id="personName" ><br>
+			
 			<button type="button" class="btn btn-default btn-info" id="savePersonTail" >保存人员轨迹</button><br>
 			<button type="button" class="btn btn-default btn-info" id="showPersonTail" >轨迹展示</button><br>
+			
 			<div class="divid"></div>
 			<h3>点集保存</h3>
 			<button type="button" class="btn btn-default btn-info" id="updateLinePoint" >路段点集保存</button><br>
@@ -121,6 +130,9 @@
     map.enableScrollWheelZoom(true); //启用滚轮放大缩小
     var point = new BMap.Point(120.252178,30.269275);
 	map.centerAndZoom(point,8);
+	
+	var top_left_control = new BMap.ScaleControl({anchor: BMAP_ANCHOR_TOP_LEFT});// 左上角，添加比例尺
+	map.addControl(top_left_control);
 	
 	function changeName(name){
 		$("#ROAD_NAME").val(name);

@@ -132,10 +132,8 @@ public class SiteController {
 	@RequestMapping(value = "/getAllSite", method = RequestMethod.POST)
 	@ResponseBody
 	public String getAllSite(HttpServletRequest request,String name) throws Exception, IOException{
-		Session session = SecurityUtils.getSubject().getSession();
-		String orgcode = (String) session.getAttribute(Constants.ORGCODE);
 		Map<Object,Object> condMap = new HashMap<>();
-		condMap.put("orgcode", orgcode);
+		condMap.put("orgcode", name);
 		List<Site> siteList = siteService.getSiteByUser(condMap);
 		Gson gson = new Gson();
 		return gson.toJson(siteList);
