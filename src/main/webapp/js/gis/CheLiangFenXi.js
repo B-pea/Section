@@ -207,6 +207,16 @@ $("#showAreaByName").click(function(){
 	showAreaByName();
 })
 
+$("#showAllSite").click(function(){
+	clear();
+	showAllSite();
+})
+
+$("#clearRoute2").click(function(){
+	clear();
+	clearRoute2();
+})
+
 
 showCity("浙江省");
 
@@ -2708,4 +2718,82 @@ function Map() {
         }  
         return arr;  
     };  
+}
+/******************************************************************************/
+// 站点显示
+function showAllSite(){
+	$.ajax({
+		url : 'site/getAllSitePolicy',
+		type : 'post',
+		dataType : 'json',
+		success : function(data){
+			for(var i=0,size_i=data.length;i<size_i;i++){
+				var pt = new BMap.Point(data[i].longitude,data[i].latitude);
+				var marker = new BMap.Marker(pt);
+				marker.setTitle(data[i].name);
+				markerSite(marker,pt);
+				map.addOverlay(marker);
+			}
+		}
+	})
+}
+
+var lastPt;
+// 点击监听
+function markerSite(marker,pt){
+	var policy = $("#policy").val();
+	marker.addEventListener("click",function(){
+		if(lastPt != null){
+			var id = document.getElementsByName('test');
+		    var value = new Array();
+		    for(var i = 0; i < id.length; i++){
+		    	if(id[i].checked){
+		    		value.push(id[i].value);
+		    		switch(id[i].value){
+		    			case "1":showRoadBetweenSite(lastPt,pt,10,2,"red");break;
+					    case "2":showRoadBetweenSite(lastPt,pt,11,4,"blue");break;
+					    case "3":showRoadBetweenSite(lastPt,pt,12,6,"green");break;
+					    case "4":showRoadBetweenSite(lastPt,pt,13,8,"black");break;
+		    		}
+		    	}
+		    }
+			lastPt = null;
+		}else{
+			lastPt = pt;
+		}
+	})
+}
+/*
+10：不走高速；
+11：常规路线，即多数人常走的一条路线，不受路况影响，可用于用车估价；
+12：距离较短，即距离相对较短的一条路线，但并不一定是一条优质路线；
+13：躲避拥堵
+*/
+// 显示路径
+function showRoadBetweenSite(sp,ep,policy,weight,color){
+	var url = 'http://api.map.baidu.com/direction/v1?mode=driving&origin='
+		+sp.lat+","+sp.lng+'&destination='
+		+ep.lat+","+ep.lng+'&origin_region=浙江&destination_region=浙江'
+		+'&tactics='+policy+'&output=json&ak=y9A9WkT3Y1jadGiMZwLEN7itWTS9oaQW';
+	$.ajax({
+		 type:"POST",
+		 dataType:'jsonp',
+		 url : url,
+		 success : function(data){
+			 var arr = data.result.routes[0].steps;
+			 var linePoints = "";
+			 for(var i=0;i<arr.length;i++){
+				 linePoints += arr[i].path+";";
+			 }
+			 linePoints = linePoints.substring(0,linePoints.length-1);
+			 var overlay = new BMap.Polyline(linePoints, {strokeStyle : 'solid',strokeOpacity:0.3,strokeColor : color,strokeWeight : weight,strokeOpacity : 2});
+			 map.addOverlay(overlay);
+		 }
+	});
+}
+
+// 清理线路
+function clearRoute2(){
+	map.clearOverlays();
+	showAllSite();
 }

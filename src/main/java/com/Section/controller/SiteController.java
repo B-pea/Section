@@ -158,4 +158,12 @@ public class SiteController {
 		return gson.toJson(siteList);
 	}
 	
+	@RequestMapping(value = "/getAllSitePolicy", method = RequestMethod.POST)
+	@ResponseBody
+	public String getAllSitePolicy() throws Exception, IOException{
+		Gson gson = new Gson();
+		List<Site> siteList = siteService.getAllSitePolicy();
+		return gson.toJson(siteList);
+	}
+	
 }

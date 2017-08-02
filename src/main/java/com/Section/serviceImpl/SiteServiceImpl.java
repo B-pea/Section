@@ -106,4 +106,10 @@ public class SiteServiceImpl implements SiteService{
 		return siteDao.getSiteNoRoad();
 	}
 
+	@Override
+	public List<Site> getAllSitePolicy() {
+		// TODO Auto-generated method stub
+		return siteDao.getAllSite();
+	}
+
 }

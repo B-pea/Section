@@ -42,6 +42,9 @@
 		width:100px;
 		display:inline_block;
 	}
+	.magrin_left{
+		margin-left:20px;
+	}
 </style>
 </head>
 <body>
@@ -53,6 +56,17 @@
 			<button type="button" class="btn btn-default btn-info" id="clear" >清理重复路段</button>
 			<button type="button" class="btn btn-default btn-info" id="clearRoute" >清理重复路线</button>
 			
+			<div class="divid"></div>
+			<h3>站点显示</h3>
+			<button type="button" class="btn btn-default btn-info" id="showAllSite" >站点显示</button><br>
+			<div style="margin-left:100px;">
+				<input type="checkbox" name="test" value="1" /><a onclick="sb(this)">红色：不走高速</a><br>
+				<input type="checkbox" name="test" value="2" /><a onclick="sb(this)">蓝色：常规路线</a><br>
+				<input type="checkbox" name="test" value="3" /><a onclick="sb(this)">绿色：距离较短</a><br>
+				<input type="checkbox" name="test" value="4" /><a onclick="sb(this)">黑色：躲避拥堵</a><br>
+			</div>
+			<button type="button" class="btn btn-default btn-info" id="clearRoute2" >清理线路</button><br>
+					
 			<div class="divid"></div>
 			<h3>GPS在线</h3>
 			<button type="button" class="btn btn-default btn-info" id="getPersonTail" >获取人员轨迹</button><br>
@@ -140,6 +154,14 @@
 	}
 </script>
 	<script src="js/gis/CheLiangFenXi.js"></script>
-
+<script>
+    function sb(obj){
+        if(obj.previousElementSibling.checked==true){
+            obj.previousElementSibling.checked=false;
+        }else{
+            obj.previousElementSibling.checked=true;
+        }
+    }
+</script>
 </body>
 </html>
