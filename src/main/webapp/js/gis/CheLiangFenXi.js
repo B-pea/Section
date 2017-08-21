@@ -1554,8 +1554,8 @@ function guzhangzhandian(){
 			var orderOne = [];
 			var orderTwo = [];
 			for(var i=0;i<data.length;i++){
-				orderOne.push(data[i].orderOne);
-				orderTwo.push(data[i].orderTwo);
+				orderOne.push(data[i].orderOne);	// 大数据站点列表
+				orderTwo.push(data[i].orderTwo);	// 数据库站点列表
 			}
 			var flag;
 			for(var i=0;i<orderTwo.length;i++){
@@ -1587,7 +1587,7 @@ setArray("G104",G104_array_list);
 var S101_array_list = "120.242509,30.280119;120.272431,30.310386;120.292616,30.356872;120.318056,30.384241;120.926488,30.540976";
 setArray("S101",S101_array_list);
 var S103_array_list = "120.250594,30.05421;120.163427,29.901844;120.123865,29.717273;120.072675,29.416557;120.004785,29.300159;119.871171,29.231364;119.783797,29.218929";
-setArray("S103",S103_array_list);120.131231,28.690686
+setArray("S103",S103_array_list);
 var S219_array_list = "120.13013,28.718744;120.130453,28.716328;120.131231,28.690686;120.105135,28.675416;120.104618,28.663884";
 setArray("S219",S219_array_list);
 var S322_array_list = "120.22571,28.759722;120.244067,28.80468;120.252026,28.785146";

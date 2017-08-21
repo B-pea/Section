@@ -107,6 +107,7 @@
 			<h3>匹配计算</h3>
 			<button type="button" class="btn btn-default btn-info" id="luduanguishu" >路段归属市</button>
 			<button type="button" class="btn btn-default btn-info" id="matchRoad" >路段归属道路</button>
+			<button type="button" class="btn btn-default btn-info" id="updateSiteToRoad" >站点归属道路</button><br>
 			
 			<div class="divid"></div>
 			<h3>GPS</h3>
@@ -115,7 +116,6 @@
 			
 			<div class="divid"></div>
 			<h3>其他</h3>
-			<button type="button" class="btn btn-default btn-info" id="updateSiteToRoad" >更新站点所在道路</button><br>
 			<button type="button" class="btn btn-default btn-info" id="drawSetion" >画路段</button><br>
 			<button type="button" class="btn btn-default btn-info" id="drawSetion2" >画路段2</button><br>
 			<button type="button" class="btn btn-default btn-info" id="changeColor" >换颜色</button><br>
