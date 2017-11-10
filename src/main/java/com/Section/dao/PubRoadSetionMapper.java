@@ -35,6 +35,8 @@ public interface PubRoadSetionMapper {
 
 	PubRoadSetion getSingleLinePoint(PubRoadSetion slq);
 
-	void updateOwnArea(PubRoadSetion setion); 
+	void updateOwnArea(PubRoadSetion setion);
+
+	List<PubRoadSetion> getRoutAllEmptyPoints(); 
   
 }

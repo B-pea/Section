@@ -1,6 +1,7 @@
 package com.Section.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,10 +15,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.mysql.fabric.xmlrpc.base.Data;
 import com.Section.model.PubRoadRoute;
 import com.Section.model.PubRoadSetion;
 import com.Section.model.Site;
 import com.Section.service.SiteService;
+import com.alibaba.fastjson.JSONObject;
 import com.Section.service.PubRoadRouteService;
 import com.Section.service.PubRoadSetionService;
 
@@ -31,6 +34,18 @@ public class GetDirectionController {
 	private PubRoadSetionService pubRoadSetionService; // 路段
 	@Autowired  
     private SiteService siteService; // 站点
+	
+	Gson gson = new Gson();
+	ArrayList<Object> arrList = new ArrayList<Object>();
+	ArrayList<Object> arrList1 = new ArrayList<Object>();
+	ArrayList<Object> arrList2 = new ArrayList<Object>();
+	int[] list_1_2 = {1,2};
+	int[] list_60_66_75 = {60,66,75};
+	int[] list_0_1 = {0,1};
+	int[] list_1_2_3_4 = {1,2,3,4};
+	int[] list_10_12_13_15 = {10,12,13,15};
+	int[] list_8_10_12 = {8,10,12};
+	Random rand = new Random();
 	
 	/**
 	 * 
@@ -46,28 +61,14 @@ public class GetDirectionController {
 	@RequestMapping(value = "/getDirectionList", method = RequestMethod.POST)
 	@ResponseBody
 	public String getDirectionList(String array,String type)throws Exception{
+		StringBuffer roadSetion = new StringBuffer();
+		
 		System.out.println("进入");
-		System.out.println(array);
-		Gson gson = new Gson();
-		ArrayList<Object> arrList = new ArrayList<Object>();
-		ArrayList<Object> arrList1 = new ArrayList<Object>();
-		ArrayList<Object> arrList2 = new ArrayList<Object>();
 		System.out.println("--------------------------------------------");
 		arrList = gson.fromJson(array, ArrayList.class);
 		String str = arrList.get(0).toString();
-		System.out.println(str);
-		System.out.println("--------------------------------------------");
 		arrList1 = gson.fromJson(str, ArrayList.class);
-		StringBuffer roadSetion = new StringBuffer();
 		Integer size = 0;
-		
-		int[] list_1_2 = {1,2};
-		int[] list_60_66_75 = {60,66,75};
-		int[] list_0_1 = {0,1};
-		int[] list_1_2_3_4 = {1,2,3,4};
-		int[] list_10_12_13_15 = {10,12,13,15};
-		int[] list_8_10_12 = {8,10,12};
-		Random rand = new Random();
 		
 		// 将百度返回的路段信息插入路段表(pub_road_setion)
 		for(int i=0; i<arrList1.size();i++){
@@ -81,8 +82,18 @@ public class GetDirectionController {
 			pubRoadSetion.setStartLatitude(arrList2.get(2).toString());
 			pubRoadSetion.setEndLongtude(arrList2.get(3).toString());
 			pubRoadSetion.setEndLatitude(arrList2.get(4).toString());
-			String line_points = (String) arrList2.get(6);
-			pubRoadSetion.setLine_points(line_points);
+			String line_points = arrList2.get(6).toString();
+			if(line_points.equals("[x]")) {
+				pubRoadSetion.setLine_points("");
+			}else {
+				String[] linePointsList = line_points.split(",");
+				line_points = "";
+				for(int k=0;k<linePointsList.length;k+=2) {
+					line_points+=linePointsList[k]+","+linePointsList[k+1]+";";
+				}
+				line_points = line_points.substring(1, line_points.length()-2);
+				pubRoadSetion.setLine_points(line_points.replace(" ", ""));
+			}
 			// 准备setion_type数据
 			int setion_type = 1;//list_1_2[rand.nextInt(2)];
 			int sect_avg_speed = list_60_66_75[rand.nextInt(3)];
@@ -126,11 +137,8 @@ public class GetDirectionController {
 				roadSetion.insert(0, ",");
 			}			
 		}
-		System.out.println(arrList.get(1));
 		String a1[] = arrList.get(2).toString().split(",");
-		System.out.println(a1[0]+":"+a1[1]);
 		String a2[] = arrList.get(3).toString().split(",");
-		System.out.println(a2[0]+":"+a2[1]);
 		PubRoadRoute pubRoadRoute = new PubRoadRoute();
 		pubRoadRoute.setStartLongtude(a1[1]);
 		pubRoadRoute.setStartLatitude(a1[0]);
@@ -146,9 +154,14 @@ public class GetDirectionController {
 		pubRoadRoute.setType(type);
 		
 		pubRoadRouteService.insert(pubRoadRoute);
-		
+
 		System.out.println("--------------------------------------------");		
 		System.out.println("结束");
+		
+		arrList.clear();
+		arrList1.clear();
+		arrList2.clear();
+		
 		return "成功";
 	}
 	

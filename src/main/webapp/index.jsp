@@ -55,10 +55,22 @@
 			<button type="button" class="btn btn-default btn-info" id="create" >路线路段生成</button>
 			<button type="button" class="btn btn-default btn-info" id="clear" >清理重复路段</button>
 			<button type="button" class="btn btn-default btn-info" id="clearRoute" >清理重复路线</button>
+			<button type="button" class="btn btn-default btn-info" id="createRouteNew" >新路线路段生成</button>
+			
+			<div class="divid"></div>
+			<h3>路段与路线生成</h3>
+			<select class='select-st' id="siteStart"  onchange="showRouteSite(this.value)">
+				<option>请选择起始站点</option>
+			</select>
+			<br>
+			<select class='select-st' id="siteEnd"  onchange="showRouteSite(this.value)">
+				<option>请选择终止站点</option>
+			</select>
+			<button type="button" class="btn btn-default btn-info" onclick="showRoute()" >显示路径</button>
 			
 			<div class="divid"></div>
 			<h3>站点显示</h3>
-			<button type="button" class="btn btn-default btn-info" id="showAllSite" >站点显示</button><br>
+			<button type="button" class="btn btn-default btn-info" id="showAllSite" >站点显示</button>请输入半径0-1：<input id="squareSide"  value="0.2"><br>
 			<div style="margin-left:100px;">
 				<input type="checkbox" name="test" value="1" /><a onclick="sb(this)">红色：不走高速</a><br>
 				<input type="checkbox" name="test" value="2" /><a onclick="sb(this)">蓝色：常规路线</a><br>
@@ -162,6 +174,25 @@
             obj.previousElementSibling.checked=true;
         }
     }
+</script>
+<script>
+	$("#siteStart").children().remove();
+	$("#siteEnd").children().remove();
+	$.ajax({
+		type : "POST",
+		dataType : "json",
+		url : "getroad/getSiteCodeOld",
+		success : function(data) {
+			for(var i=0;i<data.length;i++){
+				var option = $('<option value="'+data[i].startSite+'">'+data[i].startSite+'</option>')
+				option.appendTo($("#siteStart"));
+			}
+			for(var i=0;i<data.length;i++){
+				var option = $('<option value="'+data[i].startSite+'">'+data[i].startSite+'</option>')
+				option.appendTo($("#siteEnd"));
+			}
+		}
+	})
 </script>
 </body>
 </html>

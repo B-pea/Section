@@ -8,6 +8,7 @@ import java.util.Random;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.text.StyledEditorKit.BoldAction;
 
 import org.aspectj.weaver.ast.Var;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitterReturnValueHandler;
 
 import com.google.gson.Gson;
 import com.Section.controller.AdminDivisionTransfiniteRankController;
@@ -27,6 +29,8 @@ import com.Section.service.PubRoadRouteService;
 import com.Section.service.PubRoadSetionAreaService;
 import com.Section.service.PubRoadSetionService;
 import com.Section.util.BigDataInterFacesClient;
+import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.deser.SettableAnyProperty;
 
 @Controller
 @RequestMapping("/getroad")
@@ -58,7 +62,7 @@ public class GetRoadRouteController {
 			double dd = route.getMiles();
 			map.put("miles", Double.toString(dd));
 			map.put("RoadRailwayID", route.getRoadRailway_id());
-			map.put("line_points", route.getLine_points());
+			map.put("line_points", ""/*route.getLine_points()*/);
 			list.add(map);
 		}
 		Gson gson = new Gson();
@@ -596,12 +600,151 @@ public class GetRoadRouteController {
 	}
 	
 	// 在路段表清除重复和相似的路段
-		@RequestMapping(value = "/insertSetionArea", method = RequestMethod.POST)
-		@ResponseBody
-		public void insertSetionArea(String area_code,String ply_points) throws Exception{
-			PubRoadSetionArea area = new PubRoadSetionArea();
-			area.setArea_code(area_code);
-			area.setPly_points(ply_points);
-			int a = pubRoadSetionAreaService.insertSetionArea(area);
+	@RequestMapping(value = "/insertSetionArea", method = RequestMethod.POST)
+	@ResponseBody
+	public void insertSetionArea(String area_code,String ply_points) throws Exception{
+		PubRoadSetionArea area = new PubRoadSetionArea();
+		area.setArea_code(area_code);
+		area.setPly_points(ply_points);
+		int a = pubRoadSetionAreaService.insertSetionArea(area);
+	}
+	
+	// 搜索路径表所有不重复的站点编码
+	@RequestMapping(value = "/getSiteCodeOld", method = RequestMethod.POST)
+	@ResponseBody
+	public String getSiteCodeOld() throws Exception{
+		List<PubRoadRoute> list = pubRoadRouteService.getSiteCodeOld();
+		Gson gson = new Gson();
+		return gson.toJson(list);
+	}
+	
+	// 根据所选站点，搜索路径表
+	@RequestMapping(value = "/showRoute", method = RequestMethod.POST)
+	@ResponseBody
+	public String showRoute(String siteStart,String siteEnd) throws Exception{
+		List<PubRoadRoute> list = pubRoadRouteService.showRoute(siteStart,siteEnd);
+		String linePoints = "";
+		JSONObject back = new JSONObject();
+		Gson gson = new Gson();
+		for(int i=0;i<list.size();i++) {
+			String idListSetion = list.get(i).getRoadSetions();
+			String[] idList = idListSetion.split(",");
+			for(int j=0;j<idList.length;j++) {
+				PubRoadSetion setion = pubRoadSetionService.selectByPrimaryKey(Integer.parseInt(idList[j]));
+				linePoints += setion.getLine_points()+";";
+			}
+			linePoints = linePoints.substring(0,linePoints.length()-1);
+			back.put(i+"", linePoints);
+			linePoints = "";
 		}
+		back.put("length", list.size());
+		return gson.toJson(back);
+	}
+	// 根据所选站点，搜索路径表
+	@RequestMapping(value = "/showRouteSite", method = RequestMethod.POST)
+	@ResponseBody
+	public String showRouteSite(String siteStart) throws Exception{
+		PubRoadRoute route = pubRoadRouteService.showRouteSite(siteStart);
+		Gson gson = new Gson();
+		return gson.toJson(route);
+	}
+	
+	// 清理重复的路段和路径
+	@RequestMapping(value = "/killRouteSetionByMiles", method = RequestMethod.POST)
+	@ResponseBody
+	public void killRouteSetionByMiles() throws Exception{
+		// 1——根据起止点和公里数，去除多余的路径及其路段
+		List<PubRoadRoute> routeAll = pubRoadRouteService.getRoutAll();
+		List<Integer> alreadyDelete = new ArrayList<>();
+		for(int i=0,size = routeAll.size();i< size;i++) {
+			System.out.println(i+"/"+size);
+			if(alreadyDelete.contains(i)) {	// 如果已经被删了
+				continue;
+			}
+			for(int j=i+1;j<size;j++) {	// 向后比较
+				if(routeAll.get(i).getStartSite().equals(routeAll.get(j).getStartSite()) 
+						&& routeAll.get(i).getEndSite().equals(routeAll.get(j).getEndSite())
+						&& routeAll.get(i).getMiles().equals(routeAll.get(j).getMiles())) {	// 如果起止点和公里数相同
+					alreadyDelete.add(j);
+					String[] idList = routeAll.get(j).getRoadSetions().split(",");
+					for(int k=0;k<idList.length;k++) {	// 删掉这个路径的所有路段
+						pubRoadSetionService.deleteByPrimaryKey(Integer.parseInt(idList[k]));
+					}
+					pubRoadRouteService.deleteByPrimaryKey(routeAll.get(j).getId());	// 删除这个路径
+				}
+			}
+		}
+		// 1.5——清理空路段
+		List<PubRoadSetion> setionEmpty = pubRoadSetionService.getRoutAllEmptyPoints();
+		for(PubRoadSetion setion : setionEmpty) {
+			updateRouteByEmptySetion(setion);
+			pubRoadSetionService.deleteByPrimaryKey(setion.getId());
+		}
+		
+		// 2——制作链表，获取重复路段
+		List<PubRoadSetion> setionAll = pubRoadSetionService.getRoutAll();
+		Map<String, Object> sameSetion = new HashMap<>();	// 以唯一id为索引，重复id的list为值
+		List<String> alreadyHave = new ArrayList<>();	// 所有重复的id集合
+		
+		for(int i=0,total=setionAll.size();i<total;i++) {
+			System.out.println("制作链表："+i+"/"+total);
+			List<String> eachSameSetionList = new ArrayList<>();	// 这个唯一id的所有重复id
+			if(alreadyHave.contains(setionAll.get(i).getId()+"")) {
+				continue;
+			}
+			boolean hasSame = false;
+			for(int j=i+1;j<total;j++) {
+				if(isSameSetion(setionAll.get(i),setionAll.get(j))) {
+					eachSameSetionList.add(setionAll.get(j).getId()+"");
+					alreadyHave.add(setionAll.get(j).getId()+"");
+					hasSame = true;
+					System.out.println("重复路段："+setionAll.get(i).getId()+"——"+setionAll.get(j).getId());
+				}
+			}
+			if(hasSame) {
+				sameSetion.put(setionAll.get(i).getId()+"", eachSameSetionList);
+			}
+		}
+		// 3——路径中，使用链表进行替换，更换后清理路段
+		int clearRoute = 0;
+		for (String key : sameSetion.keySet()) {
+			System.out.println("替换路径和清除路段："+clearRoute);
+			clearRoute++;
+			@SuppressWarnings("unchecked")
+			List<String> sameList = (List<String>) sameSetion.get(key);
+			for(String needChangeId : sameList) {
+				updateRouteInfo(key,needChangeId);
+				pubRoadSetionService.deleteByPrimaryKey(Integer.parseInt(needChangeId));
+			}
+		} 	 			
+		// 5——清理重复的路径
+		clearRouteSetion();
+	}
+	
+
+	private void updateRouteByEmptySetion(PubRoadSetion setion) {
+		// TODO Auto-generated method stub
+		PubRoadRoute route = pubRoadRouteService.getRouteBySetion(setion);
+		// 取出road_setion
+		String setionList = route.getRoadSetions();
+		// 正则替换
+		setionList = setionList.replaceAll(","+setion.getId(), "");
+		// 更新该条记录
+		route.setRoadSetions(setionList);
+		pubRoadRouteService.updateByPrimaryKey(route);
+	}
+
+	// 比较两个setion是否相同
+	public boolean isSameSetion(PubRoadSetion setionOne,PubRoadSetion setionTwo) {
+		if(setionOne.getStartLongtude().equals(setionTwo.getStartLongtude()) &&
+				setionOne.getStartLatitude().equals(setionTwo.getStartLatitude()) &&
+				setionOne.getEndLongtude().equals(setionTwo.getEndLongtude()) &&
+				setionOne.getEndLatitude().equals(setionTwo.getEndLatitude()) &&
+				(setionOne.getMiles()+"").equals(setionTwo.getMiles()+"")) {
+			return true;
+		}else {
+			return false;
+		}
+	}
+	
 }

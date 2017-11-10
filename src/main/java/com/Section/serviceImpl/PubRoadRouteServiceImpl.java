@@ -70,4 +70,34 @@ public class PubRoadRouteServiceImpl implements PubRoadRouteService {
 		return pubRoadRouteMapper.getSetionPolicy(setion_id);
 	}
 
+	@Override
+	public List<PubRoadRoute> getSiteCodeOld() {
+		// TODO Auto-generated method stub
+		return pubRoadRouteMapper.getSiteCodeOld();
+	}
+
+	@Override
+	public List<PubRoadRoute> showRoute(String siteStart, String siteEnd) {
+		// TODO Auto-generated method stub
+		return pubRoadRouteMapper.showRoute(siteStart,siteEnd);
+	}
+
+	@Override
+	public PubRoadRoute showRouteSite(String siteStart) {
+		// TODO Auto-generated method stub
+		return pubRoadRouteMapper.showRouteSite(siteStart);
+	}
+
+	@Override
+	public void deleteByPrimaryKey(Integer id) {
+		// TODO Auto-generated method stub
+		pubRoadRouteMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public PubRoadRoute getRouteBySetion(PubRoadSetion setion) {
+		// TODO Auto-generated method stub
+		return pubRoadRouteMapper.getRouteBySetion(setion);
+	}
+
 }

@@ -57,6 +57,15 @@
   	 and END_SITE = #{endSite,jdbcType=VARCHAR}
   </select>
   
+  <select id="getRouteBySetion" resultMap="BaseResultMap" parameterType="com.Section.model.PubRoadSetion">
+  	 select
+ 	 <include refid="Base_Column_List" />
+  	 from pub_road_route
+  	 where road_setions LIKE CONCAT(#{id},',','%')
+  	 or  road_setions  like CONCAT('%',',',#{id},',','%') 
+  	 or road_setions like CONCAT('%',',',#{id})
+  </select>
+  
   <delete id="deleteBySET" parameterType="com.Section.model.PubRoadRoute">
   	delete from pub_road_route
   	 where START_SITE = #{startSite,jdbcType=VARCHAR} 
@@ -71,6 +80,18 @@
   	 where road_setions LIKE CONCAT(#{necId},',','%')
   	 or  road_setions  like CONCAT('%',',',#{necId},',','%') 
   	 or road_setions like CONCAT('%',',',#{necId})
+  </select>
+  
+  <select id="getSiteCodeOld" resultMap="BaseResultMap" >
+  	select * from pub_road_route group by START_SITE order by START_SITE
+  </select>
+  
+  <select id="showRoute" resultMap="BaseResultMap" >
+  	select * from pub_road_route where START_SITE = #{siteStart} and END_SITE = #{siteEnd}
+  </select>
+  
+  <select id="showRouteSite" resultMap="BaseResultMap" >
+  	select * from pub_road_route where START_SITE = #{siteStart} limit 1
   </select>
   
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >

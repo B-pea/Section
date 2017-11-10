@@ -2,6 +2,7 @@ package com.Section.service;
 
 import java.util.List;
 import com.Section.model.PubRoadRoute;
+import com.Section.model.PubRoadSetion;
 
 public interface PubRoadRouteService {
 	int insert(PubRoadRoute record);
@@ -21,6 +22,16 @@ public interface PubRoadRouteService {
 	void updateSpeedByID(PubRoadRoute up_route);
 
 	PubRoadRoute getSetionPolicy(PubRoadRoute temp);
+
+	List<PubRoadRoute> getSiteCodeOld();
+
+	List<PubRoadRoute> showRoute(String siteStart, String siteEnd);
+
+	PubRoadRoute showRouteSite(String siteStart);
+
+	void deleteByPrimaryKey(Integer id);
+
+	PubRoadRoute getRouteBySetion(PubRoadSetion setion);
 
 
 }

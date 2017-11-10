@@ -2,7 +2,10 @@ package com.Section.dao;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import com.Section.model.PubRoadRoute;
+import com.Section.model.PubRoadSetion;
 
 
 public interface PubRoadRouteMapper {
@@ -31,5 +34,13 @@ public interface PubRoadRouteMapper {
 	void updateSpeedByID(PubRoadRoute up_route);
 
 	PubRoadRoute getSetionPolicy(PubRoadRoute setion_id);
+
+	List<PubRoadRoute> getSiteCodeOld();
+
+	List<PubRoadRoute> showRoute(@Param("siteStart")String siteStart, @Param("siteEnd")String siteEnd);
+
+	PubRoadRoute showRouteSite(@Param("siteStart")String siteStart);
+
+	PubRoadRoute getRouteBySetion(PubRoadSetion setion);
 
 }

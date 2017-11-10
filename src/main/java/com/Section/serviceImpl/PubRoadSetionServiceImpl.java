@@ -96,6 +96,12 @@ public class PubRoadSetionServiceImpl implements PubRoadSetionService {
 		pubRoadSetionMapper.updateByPrimaryKeySelective(setion);
 	}
 
+	@Override
+	public List<PubRoadSetion> getRoutAllEmptyPoints() {
+		// TODO Auto-generated method stub
+		return pubRoadSetionMapper.getRoutAllEmptyPoints();
+	}
+
 
 	
 	

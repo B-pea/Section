@@ -34,6 +34,14 @@
    from pub_road_setion
   <!-- where line_points is null -->
   </select>
+  
+  <select  id="getRoutAllEmptyPoints" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+  select 
+   <include refid="Base_Column_List" />
+   from pub_road_setion
+  where line_points = ""
+  </select>
+  
   <select  id="getroutMated" resultMap="BaseResultMap" parameterType="java.lang.Integer">
   select 
    ID,line_points

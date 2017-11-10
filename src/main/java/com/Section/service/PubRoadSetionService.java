@@ -29,4 +29,6 @@ public interface PubRoadSetionService {
 	void updateOwnArea(PubRoadSetion setion);
 
 	void updateByPrimaryKeySelective(PubRoadSetion setion);
+
+	List<PubRoadSetion> getRoutAllEmptyPoints();
 }

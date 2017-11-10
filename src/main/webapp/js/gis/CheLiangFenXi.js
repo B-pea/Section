@@ -217,6 +217,11 @@ $("#clearRoute2").click(function(){
 	clearRoute2();
 })
 
+$("#createRouteNew").click(function(){
+	clear();
+	createRouteNew();
+})
+
 
 showCity("浙江省");
 
@@ -441,8 +446,22 @@ function updateLabel(id, str) {
 
 /********************************在路线表中清理重复站点********************************/
 
+function killRouteSetionByMiles(){
+	$.ajax({
+		type:"POST",
+		url:"getroad/killRouteSetionByMiles",
+		async:"true"	// 同步
+	})
+}
+
 // 检测所有路段，整理出相同路段和相似路段
 function checkSame(){
+	
+	// 在路径表中，删除长度相同，起止点相同的路径及其路段
+	killRouteSetionByMiles();
+	
+	return;	// 去java里面处理
+	
 	var same_num = 0; // 相同路段的种类数
 	var same_count = 0;// 相同路段的重复数，除了第一次
 	var close_num = 0;	// 相似路段的数量
@@ -451,7 +470,6 @@ function checkSame(){
 	$.ajax({
 		type:"POST",
 		url:"getroad/getroutInfo",
-		async: false,
 		dataType:'json',
 		success:function(data){// 获取全部路段的记录
 			for(var i=0,size = data.length;i<size;i++){
@@ -503,7 +521,7 @@ function checkSame(){
 						first_flag = true;	// 如果第二次出现，就不在放入重复种类的数量中
 					}
 					
-					if(data[i].miles != data[j].miles){
+					/*if(data[i].miles != data[j].miles){
 						if( get_distance(data[i].StartLatitude,data[i].StartLongtude,data[j].StartLatitude,data[j].StartLongtude)<0.01
 								&& get_distance(data[i].EndLatitude,data[i].EndLongtude,data[j].EndLatitude,data[j].EndLongtude)<0.01){
 							close_num++;	// 计算相近距离小于10米的近似路段
@@ -513,7 +531,7 @@ function checkSame(){
 							div.append(content);
 							//break;
 						}
-					}
+					}*/
 					
 				}
 				if(same_list_one.length != 0){
@@ -531,7 +549,7 @@ function checkSame(){
 		}
 	})
 	$("#showResult").html(same_num);
-	alert(same_count);
+	//alert(same_count);
 }
 
 // 清理相同路段(线路表)
@@ -547,7 +565,6 @@ function sql_kill_same(){
 			$.ajax({
 				url:"getroad/updataRouteInfo",
 				type:"POST",
-				async: false,
 				data:{
 					targetId:target_id+1,
 					ncId:need_change_list[j]+1
@@ -572,7 +589,6 @@ var id_list_key = id_near_map.keys();// 6个相似重复类,不会因为去重�
 			$.ajax({
 				url:"getroad/updataRouteInfoNear",
 				type:"POST",
-				async: false,
 				data:{
 					targetId:target_id+1,
 					ncId:need_change_list[j]+1
@@ -589,7 +605,6 @@ function sql_kill_useless(same_list,near_list){
 		$.ajax({
 			url:"getroad/deleteSetionByID",
 			type:'post',
-			async:false,
 			data:{
 				id:same_list[i]+1	// 以前push的是j从0开始，表中id从1开始
 			}
@@ -620,7 +635,6 @@ function getAllSetionId(){
 				$.ajax({
 					url:"getroad/selectByPrimaryKey",
 					type:'post',
-					async:false,
 					dataType:'json',
 					data:{
 						id:data[i]
@@ -2750,10 +2764,10 @@ function markerSite(marker,pt){
 		    	if(id[i].checked){
 		    		value.push(id[i].value);
 		    		switch(id[i].value){
-		    			case "1":showRoadBetweenSite(lastPt,pt,10,2,"red");break;
-					    case "2":showRoadBetweenSite(lastPt,pt,11,4,"blue");break;
-					    case "3":showRoadBetweenSite(lastPt,pt,12,6,"green");break;
-					    case "4":showRoadBetweenSite(lastPt,pt,13,8,"black");break;
+		    			case "1":moreRoad(lastPt,pt,10,2,"red");break;
+					    case "2":moreRoad(lastPt,pt,11,4,"blue");break;
+					    case "3":moreRoad(lastPt,pt,12,6,"green");break;
+					    case "4":moreRoad(lastPt,pt,13,8,"black");break;
 		    		}
 		    	}
 		    }
@@ -2763,6 +2777,151 @@ function markerSite(marker,pt){
 		}
 	})
 }
+
+// 正方形规则添加途径点
+function moreRoad(startPt,endPt,policy,weight,color){
+	var squareSide = parseFloat($("#squareSide").val());	// 正方形边长度数，认为是二维平面
+	var threePoints = getThreePoint(startPt,endPt,squareSide);
+	
+	/*var s_available_1 = new BMap.Point(sLng_available_1,sLat_available_1);		// 显示3个方向点
+	var e_available_1 = new BMap.Point(eLng_available_1,eLat_available_1);
+	var marker1 = new BMap.Marker(s_available_1);
+	var marker2 =  new BMap.Marker(e_available_1);
+	map.addOverlay(marker1);
+	map.addOverlay(marker2);
+	var s_available_2 = new BMap.Point(sLng_available_2,sLat_available_2);
+	var e_available_2 = new BMap.Point(eLng_available_2,eLat_available_2);
+	var marker3 = new BMap.Marker(s_available_2);
+	var marker4 =  new BMap.Marker(e_available_2);
+	map.addOverlay(marker3);
+	map.addOverlay(marker4);
+	var s_available_3 = new BMap.Point(sLng_available_3,sLat_available_3);
+	var e_available_3 = new BMap.Point(eLng_available_3,eLat_available_3);
+	var marker5 = new BMap.Marker(s_available_3);
+	var marker6 =  new BMap.Marker(e_available_3);
+	map.addOverlay(marker5);
+	map.addOverlay(marker6);*/
+	
+	showRoadBetweenSite(startPt,endPt,policy,weight,color,"");	// 默认的始发点
+	var wayPoints = threePoints.split(";")[0];
+	showRoadBetweenSite(startPt,endPt,policy,weight,color,wayPoints);	// 第一组途径点
+	wayPoints = threePoints.split(";")[1];
+	showRoadBetweenSite(startPt,endPt,policy,weight,color,wayPoints);	// 第二组途径点
+	wayPoints = threePoints.split(";")[2];
+	showRoadBetweenSite(startPt,endPt,policy,weight,color,wayPoints);	// 第三组途径点
+	
+}
+
+function getThreePoint(startBMapPoint,endBMapPoint,squareSide){
+	// 设置8个角点
+	var sLng_1 = startBMapPoint.lng-squareSide;		// 左上
+	var sLat_1 = startBMapPoint.lat+squareSide;
+	var sLng_2 = startBMapPoint.lng+squareSide;	// 右上
+	var sLat_2 = startBMapPoint.lat+squareSide;
+	var sLng_3 = startBMapPoint.lng+squareSide;	// 右下
+	var sLat_3 = startBMapPoint.lat-squareSide;
+	var sLng_4 = startBMapPoint.lng-squareSide;		// 左下
+	var sLat_4 = startBMapPoint.lat-squareSide;
+	var sLng_5 = startBMapPoint.lng;						// 上
+	var sLat_5 = startBMapPoint.lat+squareSide;
+	var sLng_6 = startBMapPoint.lng+squareSide;	// 右
+	var sLat_6 = startBMapPoint.lat;
+	var sLng_7 = startBMapPoint.lng;						// 下
+	var sLat_7 = startBMapPoint.lat-squareSide;
+	var sLng_8 = startBMapPoint.lng-squareSide;		// 左
+	var sLat_8 = startBMapPoint.lat;
+	
+	var eLng_1 = endBMapPoint.lng-squareSide;		// 左上
+	var eLat_1 = endBMapPoint.lat+squareSide;
+	var eLng_2 = endBMapPoint.lng+squareSide;		// 右上
+	var eLat_2 = endBMapPoint.lat+squareSide;
+	var eLng_3 = endBMapPoint.lng+squareSide;		// 右下
+	var eLat_3 = endBMapPoint.lat-squareSide;
+	var eLng_4 = endBMapPoint.lng-squareSide;		// 左下
+	var eLat_4 = endBMapPoint.lat-squareSide;
+	var eLng_5 = endBMapPoint.lng;						// 上
+	var eLat_5 = endBMapPoint.lat+squareSide;
+	var eLng_6 = endBMapPoint.lng+squareSide;		// 右
+	var eLat_6 = endBMapPoint.lat;
+	var eLng_7 = endBMapPoint.lng;						// 下
+	var eLat_7 = endBMapPoint.lat-squareSide;
+	var eLng_8 = endBMapPoint.lng-squareSide;		// 左
+	var eLat_8 = endBMapPoint.lat;
+	// 确定为左右关系还是上下关系，默认二维平面
+	var dis_lng = startBMapPoint.lng - endBMapPoint.lng;
+	var dis_lat = startBMapPoint.lat - endBMapPoint.lat;
+	// 选择其中3个角点
+	var sLng_available_1 = 0;		// 第一组
+	var sLat_available_1 = 0;
+	var eLng_available_1 = 0;
+	var eLat_available_1 = 0;
+	var sLng_available_2 = 0;		// 第二组
+	var sLat_available_2 = 0;
+	var eLng_available_2 = 0;
+	var eLat_available_2 = 0;
+	var sLng_available_3 = 0;		// 第三组
+	var sLat_available_3 = 0;
+	var eLng_available_3 = 0;
+	var eLat_available_3 = 0;
+	if(dis_lat>0 && dis_lng<0){	// 上下关系，且始发站在上、终止站在下；始发在左，终止在右
+		sLng_available_1 = sLng_6;	// 右侧一组
+		sLat_available_1 = sLat_6;
+		eLng_available_1 = eLng_5;
+		eLat_available_1 = eLat_5;
+		sLng_available_2 = sLng_3;	// 右下侧一组
+		sLat_available_2 = sLat_3;
+		eLng_available_2 = eLng_1;
+		eLat_available_2 = eLat_1;
+		sLng_available_3 = sLng_7;	// 下侧一组
+		sLat_available_3 = sLat_7;
+		eLng_available_3 = eLng_8;
+		eLat_available_3 = eLat_8;
+	}else if(dis_lat>0 && dis_lng>0){	// 上下关系，且始发站在上、终止站在下；始发在右，终止在左
+		sLng_available_1 = sLng_8;	// 左侧一组
+		sLat_available_1 = sLat_8;
+		eLng_available_1 = eLng_5;
+		eLat_available_1 = eLat_5;
+		sLng_available_2 = sLng_4;	// 左下侧一组
+		sLat_available_2 = sLat_4;
+		eLng_available_2 = eLng_2;
+		eLat_available_2 = eLat_2;
+		sLng_available_3 = sLng_7;	// 下侧一组
+		sLat_available_3 = sLat_7;
+		eLng_available_3 = eLng_6;
+		eLat_available_3 = eLat_6;
+	}else if(dis_lat<0 && dis_lng<0){// 上下关系，且始发站在下、终止站在上；始发在左，终止在右
+		sLng_available_1 = sLng_6;	// 右侧一组
+		sLat_available_1 = sLat_6;
+		eLng_available_1 = eLng_7;
+		eLat_available_1 = eLat_7;
+		sLng_available_2 = sLng_2;	// 右上侧一组
+		sLat_available_2 = sLat_2;
+		eLng_available_2 = eLng_4;
+		eLat_available_2 = eLat_4;
+		sLng_available_3 = sLng_5;	// 上侧一组
+		sLat_available_3 = sLat_5;
+		eLng_available_3 = eLng_8;
+		eLat_available_3 = eLat_8;
+	}else if(dis_lat<0 && dis_lng>0){// 上下关系，且始发站在下、终止站在上；始发在右，终止在左
+		sLng_available_1 = sLng_8;	// 左侧一组
+		sLat_available_1 = sLat_8;
+		eLng_available_1 = eLng_7;
+		eLat_available_1 = eLat_7;
+		sLng_available_2 = sLng_1;	// 左上侧一组
+		sLat_available_2 = sLat_1;
+		eLng_available_2 = eLng_3;
+		eLat_available_2 = eLat_3;
+		sLng_available_3 = sLng_5;	// 上侧一组
+		sLat_available_3 = sLat_5;
+		eLng_available_3 = eLng_6;
+		eLat_available_3 = eLat_6;
+	}
+	var returnThreePointlist = sLat_available_1+","+sLng_available_1+"|"+eLat_available_1+","+eLng_available_1+";"+
+	sLat_available_2+","+sLng_available_2+"|"+eLat_available_2+","+eLng_available_2+";"+
+	sLat_available_3+","+sLng_available_3+"|"+eLat_available_3+","+eLng_available_3;
+	return returnThreePointlist;
+}
+
 /*
 10：不走高速；
 11：常规路线，即多数人常走的一条路线，不受路况影响，可用于用车估价；
@@ -2770,30 +2929,346 @@ function markerSite(marker,pt){
 13：躲避拥堵
 */
 // 显示路径
-function showRoadBetweenSite(sp,ep,policy,weight,color){
+function showRoadBetweenSite(sp,ep,policy,weight,color,wayPoints){
 	var url = 'http://api.map.baidu.com/direction/v1?mode=driving&origin='
 		+sp.lat+","+sp.lng+'&destination='
 		+ep.lat+","+ep.lng+'&origin_region=浙江&destination_region=浙江'
 		+'&tactics='+policy+'&output=json&ak=y9A9WkT3Y1jadGiMZwLEN7itWTS9oaQW';
+	if(wayPoints != ""){
+		url = 'http://api.map.baidu.com/direction/v1?mode=driving&origin='
+			+sp.lat+","+sp.lng+'&destination='
+			+ep.lat+","+ep.lng+'&origin_region=浙江&destination_region=浙江'
+			+'&tactics='+policy+'&waypoints='+wayPoints+'&output=json&ak=y9A9WkT3Y1jadGiMZwLEN7itWTS9oaQW';
+	}
 	$.ajax({
 		 type:"POST",
 		 dataType:'jsonp',
 		 url : url,
 		 success : function(data){
-			 var arr = data.result.routes[0].steps;
 			 var linePoints = "";
-			 for(var i=0;i<arr.length;i++){
-				 linePoints += arr[i].path+";";
+			 for(var j=0;j<data.result.routes.length;j++){
+				 var arr = data.result.routes[j].steps;
+				 for(var i=0;i<arr.length;i++){
+					 linePoints += arr[i].path+";";
+				 }
 			 }
 			 linePoints = linePoints.substring(0,linePoints.length-1);
-			 var overlay = new BMap.Polyline(linePoints, {strokeStyle : 'solid',strokeOpacity:0.3,strokeColor : color,strokeWeight : weight,strokeOpacity : 2});
+			 // 清理往返路线
+			 var pointArray = linePoints.split(";");
+			 var newArray = [];
+			 var date = new Date();
+			 var startDate = date.getTime();
+			 for(var i=0;i<pointArray.length;i++){
+				 var newPtLng = pointArray[i].split(",")[0];
+				 var newPtLat = pointArray[i].split(",")[1];
+				 for(var k=i+5;k<pointArray.length && k<5000;k=k+10){	// 从当前点往后间隔 20个点，在往后数，如果有一个点与当前点距离小于50米
+					 var oldPtLng = pointArray[k].split(",")[0];
+					 var oldPtLat = pointArray[k].split(",")[1];
+					 var disCompare = get_distance(newPtLat,newPtLng,oldPtLat,oldPtLng);
+					 if(disCompare<0.06){
+						 i=k;
+						 break;
+					 }
+				 }
+				 newArray.push(pointArray[i]);
+			 }
+			 // 组合仍然存在的路段
+			 var allSmallPath = [];
+			 var newPath="";
+			 for(var j=0;j<data.result.routes.length;j++){		// 一条路上的所有大路段（被途径点截断）
+				 var arr = data.result.routes[j].steps;
+				 for(var i=0;i<arr.length;i++){	// 每个大路段的所有小路段
+					 var pathPoints = arr[i].path.split(";");
+					 var pathFlag = 0;
+					 var pathLeftNum = 0;
+					 var halfPath = "";
+					 for(var k=0;k<pathPoints.length;k++){		// 每个小路段的所有点，是否仍在清理返回点后的路线上
+						 if(newArray.indexOf(pathPoints[k])<0){
+							 pathLeftNum++;
+						 }else{
+							 halfPath +=pathPoints[k]+";";
+						 }
+						 if(pathLeftNum/pathPoints.length == 1){
+							 pathFlag = 1;
+							 break;
+						 }
+					 }
+					 if(pathFlag == 1){	// 如果这个路段不在清理返回点后的路线上
+						 continue;
+					 }
+					 if(halfPath != ""){		// 半个路段的，新生产路段，加入其中
+						 halfPath = halfPath.substring(0,halfPath.length-1);
+						 newPath += halfPath+";";
+						 continue;
+					 }
+					 newPath +=arr[i].path+";";
+				 }
+			 }
+			 
+			 /*linePoints = "";
+			 for(var i=0;i<newArray.length;i++){
+				 linePoints += newArray[i]+";";
+			 }
+			 linePoints = linePoints.substring(0,linePoints.length-1);*/
+			 newPath = newPath.substring(0,newPath.length-1);
+			 
+			 var dateEnd = new Date();
+			 var endDate = dateEnd.getTime();
+			 console.log(endDate - startDate);
+			 var overlay = new BMap.Polyline(newPath, {strokeStyle : 'solid',strokeOpacity:0.3,strokeColor : color,strokeWeight : weight,strokeOpacity : 2});
 			 map.addOverlay(overlay);
 		 }
 	});
 }
 
+// 工具-删除数组指定值
+function removeByValue(arr, val) {
+	  for(var i=0; i<arr.length; i++) {
+	    if(arr[i] == val) {
+	      arr.splice(i, 1);
+	      break;
+	    }
+	  }
+	}
+
 // 清理线路
 function clearRoute2(){
 	map.clearOverlays();
 	showAllSite();
+}
+
+/*******************************************新版路段生成*****************************************************/
+// 新路段生成
+function createRouteNew(){
+	$.ajax({
+		type:'POST',
+		dataType:'json',
+		url : 'direction/getSiteInfo',
+		async: false,
+		success : function(data){
+			for(var i=0;i<data.length;i++){
+				for(var j=0;j<data.length;j++){
+					if(i == j){
+						continue;
+					}
+					var  start  = data[i].latitude+","+data[i].longitude;
+					var  end  = data[j].latitude+","+data[j].longitude;
+					var startorg = data[i].orgCode;
+					var endorg = data[j].orgCode;
+					// 获取三个方向点
+					var threePoints = getThreePoint(new BMap.Point(data[i].longitude,data[i].latitude),new BMap.Point(data[j].longitude,data[j].latitude),0.2);
+					// 四个策略，每个策略跑4条路径
+					var policyList = ["10","11","12","13"];
+					var startBMapPoint = new BMap.Point(data[i].longitude,data[i].latitude);
+					var endBMapPoint = new BMap.Point(data[j].longitude,data[j].latitude);
+					var totalOrder = i+j;
+					for(var k=0;k<policyList.length;k++){
+						if(Math.abs(data[i].latitude - data[j].latitude) <0.6 && Math.abs(data[i].longitude - data[j].longitude) <0.6){
+							getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,"",totalOrder);
+						}else if(policyList[k] == "11"){
+							getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,"",totalOrder);
+							getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,threePoints.split(";")[0],totalOrder);
+							getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,threePoints.split(";")[1],totalOrder);
+							getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,threePoints.split(";")[2],totalOrder);
+						}else{
+							getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,"",totalOrder);
+						}
+					}
+				}				
+			}
+		}
+	});	
+}
+
+function getBMapRoute(sp,ep,policy,startorg,endorg,wayPoints,totalOrder){
+	var url = 'http://api.map.baidu.com/direction/v1?mode=driving&origin='
+		+sp.lat+","+sp.lng+'&destination='
+		+ep.lat+","+ep.lng+'&origin_region=浙江&destination_region=浙江'
+		+'&tactics='+policy+'&output=json&ak=y9A9WkT3Y1jadGiMZwLEN7itWTS9oaQW';
+	if(wayPoints != ""){
+		url = 'http://api.map.baidu.com/direction/v1?mode=driving&origin='
+			+sp.lat+","+sp.lng+'&destination='
+			+ep.lat+","+ep.lng+'&origin_region=浙江&destination_region=浙江'
+			+'&tactics='+policy+'&waypoints='+wayPoints+'&output=json&ak=y9A9WkT3Y1jadGiMZwLEN7itWTS9oaQW';
+	}
+	var startPoint = sp.lng+","+sp.lat;
+	var endPoint = ep.lng+","+ep.lat;
+	setF(url,policy,startorg,endorg,startPoint,endPoint,totalOrder);
+}
+
+// 延时发送请求
+function setF(url,policy,startorg,endorg,startPoint,endPoint,totalOrder){  
+    setTimeout(function(){$.ajax({
+		 type:"POST",
+		 dataType:'jsonp',
+		 url : url,
+		 success : function(data){
+			 handleBMapData(data,policy,startorg,endorg,startPoint,endPoint);
+		 }
+	});},totalOrder*20);  
+}  
+
+function handleBMapData(data,type,startorg,endorg,sp,ep){
+	var linePoints = "";
+	 for(var j=0;j<data.result.routes.length;j++){
+		 var arr = data.result.routes[j].steps;
+		 for(var i=0;i<arr.length;i++){
+			 linePoints += arr[i].path+";";
+		 }
+	 }
+	 linePoints = linePoints.substring(0,linePoints.length-1);
+	 // 清理往返路线
+	 var pointArray = linePoints.split(";");
+	 var newArray = [];
+	 for(var i=0;i<pointArray.length;i++){
+		 var newPtLng = pointArray[i].split(",")[0];
+		 var newPtLat = pointArray[i].split(",")[1];
+		 for(var k=i+5;k<pointArray.length && k<5000;k=k+10){	// 从当前点往后间隔 20个点，在往后数，如果有一个点与当前点距离小于50米
+			 var oldPtLng = pointArray[k].split(",")[0];
+			 var oldPtLat = pointArray[k].split(",")[1];
+			 var disCompare = get_distance(newPtLat,newPtLng,oldPtLat,oldPtLng);
+			 if(disCompare<0.06){
+				 i=k;
+				 break;
+			 }
+		 }
+		 newArray.push(pointArray[i]);
+	 }
+	 
+	 // 组合仍然存在的路段
+	 var allSmallPath = [];
+	 for(var j=0;j<data.result.routes.length;j++){		// 一条路上的所有大路段（被途径点截断）
+		 var arr = data.result.routes[j].steps;
+		 for(var i=0;i<arr.length;i++){	// 每个大路段的所有小路段
+			 var pathPoints = arr[i].path.split(";");
+			 var pathFlag = 0;
+			 var pathLeftNum = 0;
+			 var halfPath = "";
+			 for(var k=0;k<pathPoints.length;k++){		// 每个小路段的所有点，是否仍在清理返回点后的路线上
+				 if(newArray.indexOf(pathPoints[k]) == -1){
+					 pathLeftNum++;
+				 }else{
+					 halfPath +=pathPoints[k]+";";
+				 }
+			 }
+			 if(pathLeftNum/pathPoints.length>0.9){	// 如果这个路段不在清理返回点后的路线上
+				 //removeByValue(data.result.routes[j].steps,arr[i]);	// 删除全部被删掉的路段
+				 arr[i].path = "x";
+				 continue;
+			 }
+			 if(pathLeftNum == 0){
+				 continue;
+			 }
+			 if(halfPath != ""){		// 半个路段的，新生产路段，加入其中
+				 halfPath = halfPath.substring(0,halfPath.length-1);
+				 arr[i].path = halfPath;
+				 continue;
+			 }
+		 }
+	 }
+	 
+	 /*var newPath = "";
+	 for(var i=0;i<newArray.length;i++){
+		 newPath += newArray[i]+";";
+	 }
+	 newPath = newPath.substring(0,newPath.length-1);
+	 var overlay = new BMap.Polyline(newPath, {strokeStyle : 'solid',strokeOpacity:0.3,strokeColor : 'orange',strokeWeight : 4,strokeOpacity : 2});
+	 map.addOverlay(overlay);*/
+	 
+	 console.log(times+"/"+all_times);
+	 times++;
+	 var miles = 0;
+	 var map1 = new Array();	// 路径
+	 var map2 = new Array();	// 路段集合
+	 for(var j=0;j<data.result.routes.length;j++){
+		 miles += parseInt(data.result.routes[j].distance);
+		 var start1 = data.result.routes[j];
+		 var arr = data.result.routes[j].steps;
+		 for(var i=0;i<arr.length;i++){
+			 if(arr[i].path == "x"){
+				 continue;
+			 }
+			 var map3 = new Array();	// 最小的路段
+			 map3.push(arr[i].distance);
+			 map3.push(arr[i].stepOriginLocation.lng);
+			 map3.push(arr[i].stepOriginLocation.lat);
+			 map3.push(arr[i].stepDestinationLocation.lng);
+			 map3.push(arr[i].stepDestinationLocation.lat);
+			 map3.push(type);
+			 var mapLinePoints = new Array();	// 最小的路段的点集
+			 mapLinePoints.push(arr[i].path+"");
+			 map3.push(mapLinePoints);
+			 map2.push(map3);
+		 }
+	 }
+	 
+	 map1.push(map2);
+	 map1.push(miles);
+	 map1.push(sp);
+	 map1.push(ep);
+	 map1.push(startorg);
+	 map1.push(endorg);
+	 var array = JSON.stringify(map1);
+	 map2.length = 0;
+	 map1.length = 0;
+	 $.ajax({
+		 type:"POST",
+		 async: false,
+		 data : {
+			'array':array,
+			type:type
+		 },
+		 url : 'direction/getDirectionList',
+		 success : function(data){
+			 //alert("成功")
+		 },
+		 error : function(){
+			 alert("失败了")
+		 }
+	 });
+}
+
+/****************************************************显示路径******************************************/
+
+// 根据站点显示路径
+function showRoute(){
+	var siteStartCode = $("#siteStart").val();
+	var siteEndCode = $("#siteEnd").val();
+	$.ajax({
+		type : "POST",
+		dataType : "json",
+		url : "getroad/showRoute",
+		data : {
+			siteStart : siteStartCode,
+			siteEnd : siteEndCode
+		},
+		success : function(data) {
+			for(var i=0;i<data.length;i++){
+				var points = data[i];
+				var overlay = new BMap.Polyline(points, {
+					strokeColor : "red",
+					strokeWeight : 5,
+					strokeOpacity : 1
+				});
+				map.addOverlay(overlay);
+			}
+		}
+	})
+}
+
+function showRouteSite(siteCode){
+	$.ajax({
+		type : "POST",
+		dataType : "json",
+		url : "getroad/showRouteSite",
+		data : {
+			siteStart : siteCode
+		},
+		success : function(data) {
+			console.log(data)
+			var point = new BMap.Point(data.startLatitude,data.startLongtude);
+			var marker = new BMap.Marker(point);
+			map.addOverlay(marker);
+		}
+	})
 }
