@@ -31,4 +31,6 @@ public interface PubRoadSetionService {
 	void updateByPrimaryKeySelective(PubRoadSetion setion);
 
 	List<PubRoadSetion> getRoutAllEmptyPoints();
+
+	List<PubRoadSetion> getRoutAllWithoutPoints();
 }

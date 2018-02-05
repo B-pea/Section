@@ -217,13 +217,20 @@ $("#clearRoute2").click(function(){
 	clearRoute2();
 })
 
+var orderNow = "";
 $("#createRouteNew").click(function(){
 	clear();
+	orderNow = $("#orderNow").val();
 	createRouteNew();
+	setInterval(createRouteNew, $("#gapTime").val());
+})
+
+$("#isFullRoute").click(function(){
+	isFullRoute();
 })
 
 
-showCity("浙江省");
+showCity("贵州省");
 
 function clearMap(){
 	map.clearOverlays();
@@ -271,12 +278,12 @@ function createRoute(){
 function morePolicy(start,end,startorg,endorg,type){
 	var url = 'http://api.map.baidu.com/direction/v1?mode=driving&origin='
 				+start+'&destination='
-				+end+'&origin_region=浙江&destination_region=浙江'
+				+end+'&origin_region=贵州&destination_region=贵州'
 				+'&tactics='+type+'&output=json&ak=y9A9WkT3Y1jadGiMZwLEN7itWTS9oaQW';
 		ddd(start,end,startorg,endorg,url,type);// 12-最短 11-常规 10-不走高速 13-躲避拥堵
 		url = 'http://api.map.baidu.com/direction/v1?mode=driving&origin='
 			+end+'&destination='
-			+start+'&origin_region=浙江&destination_region=浙江'
+			+start+'&origin_region=贵州&destination_region=贵州'
 			+'&tactics='+type+'&output=json&ak=y9A9WkT3Y1jadGiMZwLEN7itWTS9oaQW';
 		ddd(end,start,endorg,startorg,url,type);
 }
@@ -291,7 +298,7 @@ function ddd(start,end,startorg,endorg,url,type){
 		 url : url,
 		 async: false,
 		 success : function(data){
-			 console.log(times+"/"+all_times);
+			 console.log(times);
 			 times++;
 			 var miles = data.result.routes[0].distance;
 			 var start1 = data.result.routes[0]
@@ -381,7 +388,7 @@ function updateLinePoint(){
 					})
 					var url = 'http://api.map.baidu.com/direction/v1?mode=driving&origin='
 						+start+'&destination='
-						+end+'&origin_region=浙江&destination_region=浙江'
+						+end+'&origin_region=贵州&destination_region=贵州'
 						+'&tactics='
 						+type+'&output=json&ak=y9A9WkT3Y1jadGiMZwLEN7itWTS9oaQW';
 					apiGetLinePoint(url,id,data.length);
@@ -963,7 +970,7 @@ function getRailwayPoints(){
 	var  end  = ep.lat+","+ep.lng;
 	var url = 'http://api.map.baidu.com/direction/v1?mode=driving&origin='
 			+start+'&destination='
-			+end+'&origin_region=浙江&destination_region=浙江'
+			+end+'&origin_region=贵州&destination_region=贵州'
 			+'&tactics=10&output=json&ak=y9A9WkT3Y1jadGiMZwLEN7itWTS9oaQW';
 	getTiny(url,railway_id,i);// 12-最短 11-常规 10-不走高速 13-躲避拥堵
 }*/
@@ -1339,12 +1346,12 @@ function updateRailwayLinePoint(){
 					var end = data[i].endLocation.split(",")[1]+","+data[i].endLocation.split(",")[0];
 					var url = 'http://api.map.baidu.com/direction/v1?mode=driving&origin='
 						+start+'&destination='
-						+end+'&origin_region=浙江&destination_region=浙江'
+						+end+'&origin_region=贵州&destination_region=贵州'
 						+'&tactics=10&output=json&ak=y9A9WkT3Y1jadGiMZwLEN7itWTS9oaQW';
 					//apiGetLinePointRailway(url,data[i].id,0);
 					url = 'http://api.map.baidu.com/direction/v1?mode=driving&origin='
 						+end+'&destination='
-						+start+'&origin_region=浙江&destination_region=浙江'
+						+start+'&origin_region=贵州&destination_region=贵州'
 						+'&tactics=10&output=json&ak=y9A9WkT3Y1jadGiMZwLEN7itWTS9oaQW';
 					apiGetLinePointRailway(url,data[i].id,1);
 				}				
@@ -1435,7 +1442,7 @@ function liangtiaolu2(start,end,type,color,weight){
 	
 	var url = 'http://api.map.baidu.com/direction/v1?mode=driving&origin='
 		+start+'&destination='
-		+end+'&origin_region=浙江&destination_region=浙江'
+		+end+'&origin_region=贵州&destination_region=贵州'
 		+'&tactics='
 		+type+'&output=json&ak=y9A9WkT3Y1jadGiMZwLEN7itWTS9oaQW';
 	$.ajax({
@@ -1499,9 +1506,9 @@ function containsPoint(setion_id_data_map){
 				for(var i=0,size_i = data.length;i<size_i;i++){					
 					var name = "";
 					if(data[i].orgname.indexOf("治超")>-1){
-						name = "浙江省"+data[i].orgname.split("治超")[0];
+						name = "贵州省"+data[i].orgname.split("治超")[0];
 					}else if(data[i].orgname.indexOf("检测")>-1){
-						name = "浙江省"+data[i].orgname.split("检测")[0];
+						name = "贵州省"+data[i].orgname.split("检测")[0];
 					}					 
 					getNamePly(name,data[i].orgcode,setion_id_data_map);
 				}
@@ -1770,7 +1777,7 @@ function drawMyLine(){
 
 //画出道路
 function drawRoad(sp,ep,color,weight,data,array,policyP){
-	var DrvUtil = new BMap.DrivingRoute('浙江', {
+	var DrvUtil = new BMap.DrivingRoute('贵州', {
 		onSearchComplete : function(res) {
 			if (DrvUtil.getStatus() == BMAP_STATUS_SUCCESS) {
 				var plan = res.getPlan(0);
@@ -1934,7 +1941,7 @@ function roadTryToDraw(){
 
 function showThisTemp(sp,ep,policyP,pass){
 	map.clearOverlays();
-	var DrvUtil = new BMap.DrivingRoute('浙江', {
+	var DrvUtil = new BMap.DrivingRoute('贵州', {
 		onSearchComplete : function(res) {
 			if (DrvUtil.getStatus() == BMAP_STATUS_SUCCESS) {
 				var plan = res.getPlan(0);
@@ -1976,7 +1983,7 @@ function raodSsave(){
 	var roadData = {};
 	roadData["name"] = $("#ROAD_NAME").val();
 	roadData["roadCode"] = $("#ROAD_CODE").val(); 
-	roadData["area"] = "浙江省"; 
+	roadData["area"] = "贵州省"; 
 	roadData["startLocation"] = $("#ROAD_START").val();
 	roadData["endLocation"] = $("#ROAD_END").val();
 	roadData["type"] = $("#ROAD_TYPE").val();
@@ -2248,8 +2255,8 @@ function showAreaByName(){
  * @param moveFlag 1调整视野
  */
 function showArea(name,strokeColor,fillColor,moveFlag){
-	if(name != "浙江省"){
-		name = "浙江省" + name;
+	if(name != "贵州省"){
+		name = "贵州省" + name;
 	}
 	var strokeWeight = 3;
 	if(moveFlag == 1){
@@ -2358,7 +2365,7 @@ function setMarker(bPoint, text) {
  * @param weight
  */
 function showRoad(sp,ep,color,weight,name,id){
-	var DrvUtil = new BMap.DrivingRoute('浙江', {
+	var DrvUtil = new BMap.DrivingRoute('贵州', {
 		policy:BMAP_DRIVING_POLICY_AVOID_HIGHWAYS,
 		onSearchComplete : function(res) {
 			if (DrvUtil.getStatus() == BMAP_STATUS_SUCCESS) {
@@ -2448,7 +2455,7 @@ function drawRoadByValueID(point_arr,color,weight,setionId){
  * @param weight
  */
 function showRoadSetion(sid,s_point, e_point, color, weight) {
-	var DrvUtil = new BMap.DrivingRoute('浙江', {
+	var DrvUtil = new BMap.DrivingRoute('贵州', {
 		onSearchComplete : function(res) {
 			if (DrvUtil.getStatus() == BMAP_STATUS_SUCCESS) {
 				var plan = res.getPlan(0);
@@ -2482,7 +2489,7 @@ var districtLoading = 0;
 getBoundary();
 
 function getBoundary() {   
-    addDistrict("浙江省");
+    addDistrict("贵州省");
 }
 
 
@@ -2527,11 +2534,12 @@ function drawBoundary() {
     var pSW = { lat: 3.0, lng: 73.0 }
     //向数组中添加一次闭合多边形，并将西北角再加一次作为之后画闭合区域的起点
     var pArray = [];
+
+    pArray.push(pNW);
     pArray.push(pSW);
     pArray.push(pSE);
     pArray.push(pNE);
     pArray.push(pNW);
-    pArray.push(pSW);
     //循环添加各闭合区域
     for (var i = 0; i < blist.length; i++) {
         //添加多边形层并显示
@@ -2932,12 +2940,12 @@ function getThreePoint(startBMapPoint,endBMapPoint,squareSide){
 function showRoadBetweenSite(sp,ep,policy,weight,color,wayPoints){
 	var url = 'http://api.map.baidu.com/direction/v1?mode=driving&origin='
 		+sp.lat+","+sp.lng+'&destination='
-		+ep.lat+","+ep.lng+'&origin_region=浙江&destination_region=浙江'
+		+ep.lat+","+ep.lng+'&origin_region=贵州&destination_region=贵州'
 		+'&tactics='+policy+'&output=json&ak=y9A9WkT3Y1jadGiMZwLEN7itWTS9oaQW';
 	if(wayPoints != ""){
 		url = 'http://api.map.baidu.com/direction/v1?mode=driving&origin='
 			+sp.lat+","+sp.lng+'&destination='
-			+ep.lat+","+ep.lng+'&origin_region=浙江&destination_region=浙江'
+			+ep.lat+","+ep.lng+'&origin_region=贵州&destination_region=贵州'
 			+'&tactics='+policy+'&waypoints='+wayPoints+'&output=json&ak=y9A9WkT3Y1jadGiMZwLEN7itWTS9oaQW';
 	}
 	$.ajax({
@@ -3036,7 +3044,23 @@ function clearRoute2(){
 	map.clearOverlays();
 	showAllSite();
 }
-
+function getNowFormatDate() {
+    var date = new Date();
+    var seperator1 = "-";
+    var seperator2 = ":";
+    var month = date.getMonth() + 1;
+    var strDate = date.getDate();
+    if (month >= 1 && month <= 9) {
+        month = "0" + month;
+    }
+    if (strDate >= 0 && strDate <= 9) {
+        strDate = "0" + strDate;
+    }
+    var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate
+            + " " + date.getHours() + seperator2 + date.getMinutes()
+            + seperator2 + date.getSeconds();
+    return currentdate;
+}
 /*******************************************新版路段生成*****************************************************/
 // 新路段生成
 function createRouteNew(){
@@ -3046,19 +3070,100 @@ function createRouteNew(){
 		url : 'direction/getSiteInfo',
 		async: false,
 		success : function(data){
+			
+			oneToAll(orderNow,data);
+			orderNow++;
+		}
+	});	
+}
+
+// 没有填满的路径组合，进行补全
+function isFullRoute(){
+	var fullNum = $("#fullRouteNum").val();
+	$.ajax({
+		type:'POST',
+		dataType:'json',
+		url : 'direction/getSiteInfo',
+		//async: false,
+		success : function(data1){
+			for(var i=0;i<data1.length;i++){
+				$.ajax({
+					type:'POST',
+					dataType:'json',
+					url : 'direction/isFullRoute',
+					data : {siteCode:data1[i].orgCode},
+					async: false,
+					success : function(data2){
+						if(data2.num < fullNum){
+							$.ajax({
+								type:'POST',
+								dataType:'json',
+								url : 'direction/getSiteInfo',
+								async: false,
+								success : function(data){
+									for(var j=0;j<data.length;j++){
+										
+										var  start  = data[i].latitude+","+data[i].longitude;
+										var  end  = data[j].latitude+","+data[j].longitude;
+										var startorg = data[i].orgCode;
+										if(startorg != data2.siteCode){
+											continue;
+										}
+										var endorg = data[j].orgCode;
+										// 获取三个方向点
+										//var threePoints = getThreePoint(new BMap.Point(data[i].longitude,data[i].latitude),new BMap.Point(data[j].longitude,data[j].latitude),0.2);
+										// 四个策略，每个策略跑4条路径
+										//var policyList = ["10","11","12","13"];
+										var policyList = ["12"];
+										var startBMapPoint = new BMap.Point(data[i].longitude,data[i].latitude);
+										var endBMapPoint = new BMap.Point(data[j].longitude,data[j].latitude);
+										var totalOrder = i+j;
+										for(var k=0;k<policyList.length;k++){
+											if(Math.abs(data[i].latitude - data[j].latitude) <0.6 && Math.abs(data[i].longitude - data[j].longitude) <0.6){
+												getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,"",totalOrder);
+											}else if(policyList[k] == "11"){
+												getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,"",totalOrder);
+												getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,threePoints.split(";")[0],totalOrder);
+												getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,threePoints.split(";")[1],totalOrder);
+												getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,threePoints.split(";")[2],totalOrder);
+											}else{
+												getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,"",totalOrder);
+											}
+										}
+									}		
+								}
+							});	
+						}
+					}
+				})
+			}
+		}
+	})
+}
+
+function getRouteSectionBySiteCode(siteCode){
+	$.ajax({
+		type:'POST',
+		dataType:'json',
+		url : 'direction/getSiteInfo',
+		success : function(data){
 			for(var i=0;i<data.length;i++){
+				var startorg = data[i].orgCode;
+				if(startorg != siteCode){
+					continue;
+				}
 				for(var j=0;j<data.length;j++){
 					if(i == j){
 						continue;
 					}
 					var  start  = data[i].latitude+","+data[i].longitude;
 					var  end  = data[j].latitude+","+data[j].longitude;
-					var startorg = data[i].orgCode;
 					var endorg = data[j].orgCode;
 					// 获取三个方向点
-					var threePoints = getThreePoint(new BMap.Point(data[i].longitude,data[i].latitude),new BMap.Point(data[j].longitude,data[j].latitude),0.2);
+					//var threePoints = getThreePoint(new BMap.Point(data[i].longitude,data[i].latitude),new BMap.Point(data[j].longitude,data[j].latitude),0.2);
 					// 四个策略，每个策略跑4条路径
-					var policyList = ["10","11","12","13"];
+					//var policyList = ["10","11","12","13"];
+					var policyList = ["12"];
 					var startBMapPoint = new BMap.Point(data[i].longitude,data[i].latitude);
 					var endBMapPoint = new BMap.Point(data[j].longitude,data[j].latitude);
 					var totalOrder = i+j;
@@ -3074,21 +3179,68 @@ function createRouteNew(){
 							getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,"",totalOrder);
 						}
 					}
-				}				
+				}		
 			}
 		}
-	});	
+	})
 }
 
+function oneToAll(i,data){
+	console.log(i+"/376---"+data[i].orgCode+"==="+getNowFormatDate());
+	for(var j=0;j<data.length;j++){
+		if(i == j){
+			continue;
+		}
+		var  start  = data[i].latitude+","+data[i].longitude;
+		var  end  = data[j].latitude+","+data[j].longitude;
+		var startorg = data[i].orgCode;
+		var endorg = data[j].orgCode;
+		// 获取三个方向点
+		//var threePoints = getThreePoint(new BMap.Point(data[i].longitude,data[i].latitude),new BMap.Point(data[j].longitude,data[j].latitude),0.2);
+		// 四个策略，每个策略跑4条路径
+		//var policyList = ["10","11","12","13"];
+		var policyList = ["12"];
+		var startBMapPoint = new BMap.Point(data[i].longitude,data[i].latitude);
+		var endBMapPoint = new BMap.Point(data[j].longitude,data[j].latitude);
+		var totalOrder = i+j;
+		for(var k=0;k<policyList.length;k++){
+			if(Math.abs(data[i].latitude - data[j].latitude) <0.6 && Math.abs(data[i].longitude - data[j].longitude) <0.6){
+				getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,"",totalOrder);
+			}else if(policyList[k] == "11"){
+				getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,"",totalOrder);
+				getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,threePoints.split(";")[0],totalOrder);
+				getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,threePoints.split(";")[1],totalOrder);
+				getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,threePoints.split(";")[2],totalOrder);
+			}else{
+				getBMapRoute(startBMapPoint,endBMapPoint,policyList[k],startorg,endorg,"",totalOrder);
+			}
+		}
+	}		
+}
+
+// ak 
+// y9A9WkT3Y1jadGiMZwLEN7itWTS9oaQW  很久以前的
+// 1a63afc62e06c2d3a54b3ebc9e3f6822 下载的，数量不多
+// 53oVIOgmSIejwV7EfphPgTynOZbIiVYu 下载的，数量多
+// MCFuHHmWBT9PYljVWIR3atWgqaQI2dI6 自己申请的
+// f3SnqSzsbeIw9M9ob1U8R5Rb	3万吧
+// ZUONbpqGBsYGXNIYHicvbAbM
+// sSelQoVi2L3KofLo1HOobonW
+// E4805d16520de693a3fe707cdc962045
+// 9LW9kU9jKiN1lDg8dClq8MRoMjURC0Es	挺多的
+// 3484f488a1ae1fbadaeeacf21ebd52aa
+// LXtbxUBZfNBXjuwrAljAiHIo
+// kVBXX7MlfMkukl1DgtAjLsFX
+// 53oVIOgmSIejwV7EfphPgTynOZbIiVYu
 function getBMapRoute(sp,ep,policy,startorg,endorg,wayPoints,totalOrder){
 	var url = 'http://api.map.baidu.com/direction/v1?mode=driving&origin='
 		+sp.lat+","+sp.lng+'&destination='
-		+ep.lat+","+ep.lng+'&origin_region=浙江&destination_region=浙江'
-		+'&tactics='+policy+'&output=json&ak=y9A9WkT3Y1jadGiMZwLEN7itWTS9oaQW';
+		+ep.lat+","+ep.lng+'&origin_region=贵州&destination_region=贵州'
+		+'&tactics='+policy+'&output=json&ak=9LW9kU9jKiN1lDg8dClq8MRoMjURC0Es';
 	if(wayPoints != ""){
 		url = 'http://api.map.baidu.com/direction/v1?mode=driving&origin='
 			+sp.lat+","+sp.lng+'&destination='
-			+ep.lat+","+ep.lng+'&origin_region=浙江&destination_region=浙江'
+			+ep.lat+","+ep.lng+'&origin_region=贵州&destination_region=贵州'
 			+'&tactics='+policy+'&waypoints='+wayPoints+'&output=json&ak=y9A9WkT3Y1jadGiMZwLEN7itWTS9oaQW';
 	}
 	var startPoint = sp.lng+","+sp.lat;
@@ -3098,18 +3250,38 @@ function getBMapRoute(sp,ep,policy,startorg,endorg,wayPoints,totalOrder){
 
 // 延时发送请求
 function setF(url,policy,startorg,endorg,startPoint,endPoint,totalOrder){  
-    setTimeout(function(){$.ajax({
+    $.ajax({
 		 type:"POST",
 		 dataType:'jsonp',
 		 url : url,
-		 success : function(data){
-			 handleBMapData(data,policy,startorg,endorg,startPoint,endPoint);
+		 cache:false, 
+		 success : function(data2){
+			 //handleBMapData(data,policy,startorg,endorg,startPoint,endPoint);
+			 console.log(totalOrder);
+			 $.ajax({
+				 type:"POST",
+				 //async: false,
+				 cache:false, 
+				 data : {
+					startSiteCode:startorg,
+					endSiteCode:endorg,
+					api : JSON.stringify(data2),
+					policy:policy
+				 },
+				 url : 'direction/createRouteAndSection',
+				 success : function(data){
+					 //alert("成功")
+				 },
+				 error : function(){
+					 console.log("失败了")
+				 }
+			 });
 		 }
-	});},totalOrder*20);  
+	})
 }  
 
 function handleBMapData(data,type,startorg,endorg,sp,ep){
-	var linePoints = "";
+	/*var linePoints = "";
 	 for(var j=0;j<data.result.routes.length;j++){
 		 var arr = data.result.routes[j].steps;
 		 for(var i=0;i<arr.length;i++){
@@ -3165,7 +3337,7 @@ function handleBMapData(data,type,startorg,endorg,sp,ep){
 				 continue;
 			 }
 		 }
-	 }
+	 }*/
 	 
 	 /*var newPath = "";
 	 for(var i=0;i<newArray.length;i++){
@@ -3175,7 +3347,7 @@ function handleBMapData(data,type,startorg,endorg,sp,ep){
 	 var overlay = new BMap.Polyline(newPath, {strokeStyle : 'solid',strokeOpacity:0.3,strokeColor : 'orange',strokeWeight : 4,strokeOpacity : 2});
 	 map.addOverlay(overlay);*/
 	 
-	 console.log(times+"/"+all_times);
+	 //console.log(times+"/"+all_times+"==="+getNowFormatDate());
 	 times++;
 	 var miles = 0;
 	 var map1 = new Array();	// 路径
@@ -3185,9 +3357,9 @@ function handleBMapData(data,type,startorg,endorg,sp,ep){
 		 var start1 = data.result.routes[j];
 		 var arr = data.result.routes[j].steps;
 		 for(var i=0;i<arr.length;i++){
-			 if(arr[i].path == "x"){
+			 /*if(arr[i].path == "x"){
 				 continue;
-			 }
+			 }*/
 			 var map3 = new Array();	// 最小的路段
 			 map3.push(arr[i].distance);
 			 map3.push(arr[i].stepOriginLocation.lng);
@@ -3214,6 +3386,7 @@ function handleBMapData(data,type,startorg,endorg,sp,ep){
 	 $.ajax({
 		 type:"POST",
 		 async: false,
+		 cache:false, 
 		 data : {
 			'array':array,
 			type:type
@@ -3223,7 +3396,7 @@ function handleBMapData(data,type,startorg,endorg,sp,ep){
 			 //alert("成功")
 		 },
 		 error : function(){
-			 alert("失败了")
+			 console.log("失败了")
 		 }
 	 });
 }

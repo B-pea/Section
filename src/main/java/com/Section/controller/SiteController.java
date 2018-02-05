@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
+import com.Section.dao.SiteDao;
 import com.Section.model.Site;
 import com.Section.service.OrganizationService;
 import com.Section.service.SiteService;
@@ -41,6 +42,8 @@ public class SiteController {
 	@Autowired
 	private OrganizationService organizationService;
 	
+	@Autowired
+	private SiteDao siteDao;
 	@RequestMapping(value = "/getPageSite", method = RequestMethod.POST)
 	@ResponseBody
 	public Map<String, Object> getPageSite(Integer page,Integer rows,Site site,HttpServletRequest request) throws Exception, IOException{
@@ -89,6 +92,15 @@ public class SiteController {
 			System.out.println(reply);
 		}
 	}
+	
+	@RequestMapping(value="/saveSite", method = RequestMethod.POST)
+	@ResponseBody
+	public String saveSite(Site site,HttpServletRequest request,HttpServletResponse response){
+		site.setUpdateType('M');
+		site.setLastUpdateDate(new Date());
+		siteService.updateSite(site);
+		return "true";
+	}
 
 	@RequestMapping(value="/addSite")
 	@ResponseBody
@@ -135,6 +147,14 @@ public class SiteController {
 		Map<Object,Object> condMap = new HashMap<>();
 		condMap.put("orgcode", name);
 		List<Site> siteList = siteService.getSiteByUser(condMap);
+		Gson gson = new Gson();
+		return gson.toJson(siteList);
+	}
+	
+	@RequestMapping(value = "/getSiteByCode", method = RequestMethod.POST)
+	@ResponseBody
+	public String getSiteByCode(Site site) throws Exception, IOException{
+		List<Site> siteList = siteDao.getSiteName(site.getOrgCode());
 		Gson gson = new Gson();
 		return gson.toJson(siteList);
 	}

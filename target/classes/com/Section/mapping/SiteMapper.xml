@@ -24,7 +24,7 @@
   </resultMap>
   <select id="getAllSite" resultMap="siteResultMap">
   		select *
-      	from pub_site_info 
+      	from pub_site_info where longitude != ""
   </select>
   <select  id="getSiteName" resultMap="siteResultMap"  parameterType="java.lang.String">
     	select *
@@ -32,8 +32,8 @@
      <if test="_parameter  != null and _parameter  != ''">
           where orgcode = #{orgCode,jdbcType=VARCHAR}
 	  </if> 
-    
   </select>
+  
   <select id="getSiteByPage" resultMap="siteResultMap">	  
 	  select 
           s.id ,s.orgcode,s.name,s.type,road_type,road_id,r.name as roadName,railway_id,prr.railway_name as railwayName,

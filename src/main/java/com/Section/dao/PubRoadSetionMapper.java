@@ -37,6 +37,8 @@ public interface PubRoadSetionMapper {
 
 	void updateOwnArea(PubRoadSetion setion);
 
-	List<PubRoadSetion> getRoutAllEmptyPoints(); 
+	List<PubRoadSetion> getRoutAllEmptyPoints();
+
+	List<PubRoadSetion> getRoutAllWithoutPoints(); 
   
 }

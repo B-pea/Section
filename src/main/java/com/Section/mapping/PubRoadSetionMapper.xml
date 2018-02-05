@@ -35,6 +35,13 @@
   <!-- where line_points is null -->
   </select>
   
+  <select  id="getRoutAllWithoutPoints" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+  select 
+   ID, START_LONGTUDE, START_LATITUDE, END_LONGTUDE, END_LATITUDE, MILES
+   from pub_road_setion limit 5000
+  <!-- where line_points is null -->
+  </select>
+  
   <select  id="getRoutAllEmptyPoints" resultMap="BaseResultMap" parameterType="java.lang.Integer">
   select 
    <include refid="Base_Column_List" />

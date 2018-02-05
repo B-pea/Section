@@ -48,4 +48,7 @@ public interface SiteDao {
 	List<String> getSiteStatus();
 
 	List<Site> getSiteNoRoad();
+
+	List<Site> isFullRoute(String siteCode);
+
 }

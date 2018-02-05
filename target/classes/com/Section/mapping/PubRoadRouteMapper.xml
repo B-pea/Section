@@ -94,6 +94,10 @@
   	select * from pub_road_route where START_SITE = #{siteStart} limit 1
   </select>
   
+  <select id="isFullRoute" resultType="java.lang.Integer"  parameterType="com.Section.model.PubRoadRoute" >
+  	select count(*) from pub_road_route where START_SITE = #{startSite}
+  </select>
+  
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
     delete from pub_road_route
     where ID = #{id,jdbcType=INTEGER}
@@ -108,6 +112,12 @@
       #{endLatitude,jdbcType=VARCHAR}, #{roadSetions,jdbcType=VARCHAR}, #{miles,jdbcType=DOUBLE}, #{type,jdbcType=VARCHAR}
       )
   </insert>
+  
+  <insert id="insertRouteSection" >
+    insert into pub_road_route_section (route_id,section_id)
+    values (#{routeId,jdbcType=INTEGER}, #{sectionId,jdbcType=INTEGER})
+  </insert>
+  
   <insert id="insertSelective" parameterType="com.Section.model.PubRoadRoute" >
     insert into pub_road_route
     <trim prefix="(" suffix=")" suffixOverrides="," >

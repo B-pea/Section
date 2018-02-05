@@ -33,5 +33,9 @@ public interface PubRoadRouteService {
 
 	PubRoadRoute getRouteBySetion(PubRoadSetion setion);
 
+	int isFullRoute(PubRoadRoute pubRoadRoute);
+
+	void insertRouteSection(Integer id, Integer string);
+
 
 }

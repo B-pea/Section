@@ -15,8 +15,6 @@ public class PubRoadSetionServiceImpl implements PubRoadSetionService {
 
 	@Autowired
 	private PubRoadSetionMapper pubRoadSetionMapper;
-	@Autowired
-	private PubRoadRouteMapper pubRoadRoutnMapper;
 	
 	@Override
 	public int insert(PubRoadSetion record) {
@@ -100,6 +98,12 @@ public class PubRoadSetionServiceImpl implements PubRoadSetionService {
 	public List<PubRoadSetion> getRoutAllEmptyPoints() {
 		// TODO Auto-generated method stub
 		return pubRoadSetionMapper.getRoutAllEmptyPoints();
+	}
+
+	@Override
+	public List<PubRoadSetion> getRoutAllWithoutPoints() {
+		// TODO Auto-generated method stub
+		return pubRoadSetionMapper.getRoutAllWithoutPoints();
 	}
 
 

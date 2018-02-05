@@ -43,4 +43,8 @@ public interface PubRoadRouteMapper {
 
 	PubRoadRoute getRouteBySetion(PubRoadSetion setion);
 
+	int isFullRoute(PubRoadRoute pubRoadRoute);
+
+	void insertRouteSection(@Param("routeId")Integer routeId, @Param("sectionId")Integer sectionId);
+
 }

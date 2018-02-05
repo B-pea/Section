@@ -100,4 +100,16 @@ public class PubRoadRouteServiceImpl implements PubRoadRouteService {
 		return pubRoadRouteMapper.getRouteBySetion(setion);
 	}
 
+	@Override
+	public int isFullRoute(PubRoadRoute pubRoadRoute) {
+		// TODO Auto-generated method stub
+		return pubRoadRouteMapper.isFullRoute(pubRoadRoute);
+	}
+
+	@Override
+	public void insertRouteSection(Integer routeId, Integer sectionId) {
+		// TODO Auto-generated method stub
+		pubRoadRouteMapper.insertRouteSection(routeId,sectionId);
+	}
+
 }
