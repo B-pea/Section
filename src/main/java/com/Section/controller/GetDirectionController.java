@@ -434,7 +434,8 @@ public class GetDirectionController {
 		}
 		return smallDistance;
 	}
-	
+
+	// 获取相似概率，0-1.0
 	public double getSameRatio(String[] roadPoints,String[] sectionPoints) {
 		int sameNum = 0;
 		for(String sectionPoint: sectionPoints) {
