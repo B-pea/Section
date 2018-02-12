@@ -394,7 +394,7 @@ public class GetDirectionController {
 		return gson.toJson(back);
 	}
 	
-	// 路段匹配道路
+	// 路段匹配道路，概率匹配
 	@RequestMapping(value = "/sectionMatchRoad", method = RequestMethod.POST)
 	@ResponseBody
 	public String sectionMatchRoad() throws Exception{
