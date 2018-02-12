@@ -1200,13 +1200,13 @@ function updateRoadToSetionID(road_id,setion_id){
 function showRoadSetionCompare(){
 	// 获取匹配的路段
 	$.ajax({
-		url:'getroad/getroutMated',
+		url:'direction/getSectionHaveRoad',
 		type:'post',
 		async:false,
 		dataType:'json',
 		success:function(data){
 			for(var i=0;i<data.length;i++){
-				var points = data[i].line_points;
+				var points = data[i].linePoints;
 				drawRoadByValue(points,"black",2);
 			}
 		}
@@ -1918,7 +1918,13 @@ function getPointEnd(e){
 }
 
 function addPass(e){
-	document.getElementById("ROAD_PASS").value += e.point.lng + "," + e.point.lat; 
+	var roadPass = document.getElementById("ROAD_PASS").value;
+	if(roadPass != ""){
+		document.getElementById("ROAD_PASS").value += ";"+e.point.lng + "," + e.point.lat; 
+	}else{
+		document.getElementById("ROAD_PASS").value += e.point.lng + "," + e.point.lat; 
+	}
+	 
 }
 
 function roadTryToDraw(){

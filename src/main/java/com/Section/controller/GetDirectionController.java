@@ -19,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyEmitter
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.lowagie.text.Section;
 import com.mysql.fabric.xmlrpc.base.Data;
 import com.Section.dao.DataRouteMapper;
 import com.Section.dao.DataRouteSectionMapper;
@@ -28,12 +29,14 @@ import com.Section.model.DataRouteSection;
 import com.Section.model.DataSection;
 import com.Section.model.PubRoadRoute;
 import com.Section.model.PubRoadSetion;
+import com.Section.model.Road;
 import com.Section.model.Site;
 import com.Section.service.SiteService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.Section.service.PubRoadRouteService;
 import com.Section.service.PubRoadSetionService;
+import com.Section.service.RoadService;
 
 @Controller
 @RequestMapping("/direction")
@@ -51,6 +54,8 @@ public class GetDirectionController {
     private DataRouteMapper dataRouteMapper; // 站点
 	@Autowired  
     private DataRouteSectionMapper dataRouteSectionMapper; // 站点
+	@Autowired
+	private RoadService roadService;
 	
 	Gson gson = new Gson();
 	ArrayList<Object> arrList = new ArrayList<Object>();
@@ -387,6 +392,102 @@ public class GetDirectionController {
 			back.put("result", "true");
 		}
 		return gson.toJson(back);
+	}
+	
+	// 路段匹配道路
+	@RequestMapping(value = "/sectionMatchRoad", method = RequestMethod.POST)
+	@ResponseBody
+	public String sectionMatchRoad() throws Exception{
+		List<DataSection> sectionList = dataSectionMapper.selectAllSection();
+		List<Road> roadList = roadService.getAllRoad("");
+		for(Road road : roadList) {
+			String[] roadPoints = road.getLine_points().split(";");
+			for(DataSection section : sectionList) {
+				String[] sectionPoints = section.getLinePoints().split(";");
+				double distancePrime =  getPrimaryDistance(roadPoints,sectionPoints);
+				if(distancePrime > 1) {
+					System.out.println("初始匹配太远，下一个");
+					continue;
+				}else {
+					double sameRatio = getSameRatio(roadPoints,sectionPoints);
+					if(sameRatio>0.5) {
+						section.setRoadrailwayId(road.getId());
+						dataSectionMapper.updateByPrimaryKey(section);
+					}
+				}
+			}
+		}
+		return "true";
+	}
+	
+	// 路段的第一个点与道路的距离
+	public double getPrimaryDistance(String[] roadPoints,String[] sectionPoints) {
+		double smallDistance = 100; // 100公里
+		for(String roadPoint: roadPoints) {
+			double tempDistance = getDistance(Double.parseDouble(roadPoint.split(",")[1])
+					,Double.parseDouble(roadPoint.split(",")[0])
+					,Double.parseDouble(sectionPoints[0].split(",")[1])
+					,Double.parseDouble(sectionPoints[0].split(",")[0]));
+			if(tempDistance < smallDistance) {
+				smallDistance = tempDistance;
+			}
+		}
+		return smallDistance;
+	}
+	
+	public double getSameRatio(String[] roadPoints,String[] sectionPoints) {
+		int sameNum = 0;
+		for(String sectionPoint: sectionPoints) {
+			for(String roadPoint:roadPoints) {
+				double minDistance = getDistance(Double.parseDouble(roadPoint.split(",")[1])
+						,Double.parseDouble(roadPoint.split(",")[0])
+						,Double.parseDouble(sectionPoint.split(",")[1])
+						,Double.parseDouble(sectionPoint.split(",")[0]));
+				if(minDistance < 0.1) {
+					sameNum++;
+				}
+			}
+		}
+		double sameRatio = sameNum*1.0/sectionPoints.length;
+		return sameRatio;
+	}
+	
+	public double EARTH_RADIUS = 6378.137;    
+    
+	public double rad(double d) {    
+        return d * Math.PI / 180.0;    
+    }    
+    
+    /**   
+     * 通过经纬度获取距离(单位：公里)   
+     * @param lat1   
+     * @param lng1   
+     * @param lat2   
+     * @param lng2   
+     * @return   
+     */    
+	public double getDistance(double lat1, double lng1, double lat2,    
+                                     double lng2) {    
+        double radLat1 = rad(lat1);    
+        double radLat2 = rad(lat2);    
+        double a = radLat1 - radLat2;    
+        double b = rad(lng1) - rad(lng2);    
+        double s = 2 * Math.asin(Math.sqrt(Math.pow(Math.sin(a / 2), 2)    
+                + Math.cos(radLat1) * Math.cos(radLat2)    
+                * Math.pow(Math.sin(b / 2), 2)));    
+        s = s * EARTH_RADIUS;    
+        s = Math.round(s * 10000d) / 10000d;    
+        s = s;    
+        return s;    
+    }   
+	
+	
+	// 路段匹配道路
+	@RequestMapping(value = "/getSectionHaveRoad", method = RequestMethod.POST)
+	@ResponseBody
+	public String getSectionHaveRoad() throws Exception{
+		List<DataSection> sectionList = dataSectionMapper.getSectionHaveRoad();
+		return gson.toJson(sectionList);
 	}
 	
 }

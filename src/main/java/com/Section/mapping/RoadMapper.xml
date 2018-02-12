@@ -177,6 +177,11 @@
 		SELECT * FROM pub_road where id
 		=#{id,jdbcType=VARCHAR}
 	</select>
+	
+	<select id="getLastRoadById" resultMap="BaseResultMap">
+		SELECT * FROM pub_road order by id desc limit 1
+	</select>
+	
 	<select id="findDetail" resultMap="BaseResultMap" parameterType="com.Section.model.Road">
 		select
 

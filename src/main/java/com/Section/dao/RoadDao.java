@@ -77,4 +77,6 @@ public interface RoadDao {
 		 * @see Note:
 	 */
 	List<String> selectRoadIdByCode(String code);
+
+	Road getLastRoadById();
 }

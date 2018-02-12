@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.ReplaceOverride;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.Section.dao.RoadDao;
 import com.Section.model.Road;
 import com.Section.service.RoadService;
 import com.Section.util.BigDataInterFacesClient;
@@ -44,6 +46,8 @@ public class RoadController {
 	@Autowired
 	private RoadService roadService;
 	
+	@Autowired
+	private RoadDao roadDao;
 	
 	Gson mapper = new Gson();
 	
@@ -61,6 +65,15 @@ public class RoadController {
 	@ResponseBody
 	public int inserRoad(Road road,HttpServletRequest request,HttpServletResponse response){
 		try {
+			if(road.getId() == null) {
+				Road tempRoad = roadDao.getLastRoadById();
+				int roadIdLast = Integer.parseInt(tempRoad.getId())+1;
+				String idUse = roadIdLast+"";
+				for(int i=0,size = 5-idUse.length();i<size;i++) {
+					idUse = "0"+idUse;
+				}
+				road.setId(idUse);
+			}
 			road.setSetTime(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 			road.setLastUpdateDate(new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 			roadService.addRoad(road);

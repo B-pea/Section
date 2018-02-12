@@ -88,7 +88,7 @@
 			<button type="button" class="btn btn-default btn-info" id="showRouteBySite" >显示轨迹</button>
 			
 			<div class="divid"></div>
-			<h3>路段与路线生成</h3>
+			<h3>站点间路径展示</h3>
 			<select class='select-st' id="siteStart"  onchange="showRouteSite(this.value)">
 				<option>请选择起始站点</option>
 			</select>
@@ -130,9 +130,9 @@
 			<span>道路名称</span><input class="input" id="ROAD_NAME"><span>例如:104国道</span><br>
 			<span>道路起点</span><input class="input" id="ROAD_START"><span id="span_start">点击开始拾点</span><br>
 			<span>道路终点</span><input class="input" id="ROAD_END"><span id="span_end">点击结束拾点</span><br>
-			<span>道路类型</span><input class="input" id="ROAD_TYPE" value="2"><span>2国省道，4高速</span><br>
+			<span>道路类型</span><input class="input" id="ROAD_TYPE" value="4"><span>2国省道，4高速</span><br>
 			<span>道路描述</span><input class="input" id="ROAD_DESCRIPTION"><span>例如:浙江省104国道</span><br>
-			<span>道路策略</span><input class="input" id="ROAD_POLICY" value="2"><span style="font-size:10px">0最短时间1最短距离2不走高速</span><br>
+			<span>道路策略</span><input class="input" id="ROAD_POLICY" value="0"><span style="font-size:10px">0最短时间1最短距离2不走高速</span><br>
 			<span>途径点集</span><input class="input" id="ROAD_PASS"><span id="span_append" style="font-size:10px">点击增加途经点</span><br>
 			<button  type="button" class="btn btn-default btn-info" id="roadTryToDraw" >绘制</button>
 			<button  type="button" class="btn btn-default btn-info" id="raodSsave" >保存</button>
@@ -149,6 +149,7 @@
 			<h3>匹配计算</h3>
 			<button type="button" class="btn btn-default btn-info" id="luduanguishu" >路段归属市</button>
 			<button type="button" class="btn btn-default btn-info" id="matchRoad" >路段归属道路</button>
+			<button type="button" class="btn btn-default btn-info" id="sectionMatchRoad" >新路段归属道路</button>
 			<button type="button" class="btn btn-default btn-info" id="updateSiteToRoad" >站点归属道路</button><br>
 			
 			<div class="divid"></div>
@@ -192,7 +193,7 @@
 	
 	function changeName(name){
 		$("#ROAD_NAME").val(name);
-		$("#ROAD_DESCRIPTION").val("浙江省义乌市"+name);
+		$("#ROAD_DESCRIPTION").val("贵州省"+name);
 	}
 </script>
 	<script src="js/gis/CheLiangFenXi.js"></script>
@@ -564,6 +565,13 @@ $("#saveSiteModify").click(function(){
 				handleModify(orderNow);
 			}
 		}
+	})
+})
+
+$("#sectionMatchRoad").click(function(){
+	$.ajax({
+		url : "direction/sectionMatchRoad",
+		type : "post"
 	})
 })
 </script>
