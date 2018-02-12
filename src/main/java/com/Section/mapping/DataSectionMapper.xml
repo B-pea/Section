@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.Section.dao.DataSectionMapper" >
+  <resultMap id="BaseResultMap" type="com.Section.model.DataSection" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="START_LONGTUDE" property="startLongtude" jdbcType="DOUBLE" />
+    <result column="START_LATITUDE" property="startLatitude" jdbcType="DOUBLE" />
+    <result column="END_LONGTUDE" property="endLongtude" jdbcType="DOUBLE" />
+    <result column="END_LATITUDE" property="endLatitude" jdbcType="DOUBLE" />
+    <result column="MILES" property="miles" jdbcType="DOUBLE" />
+    <result column="SETION_TYPE" property="setionType" jdbcType="VARCHAR" />
+    <result column="sect_avg_speed" property="sectAvgSpeed" jdbcType="INTEGER" />
+    <result column="is_asphalt_road" property="isAsphaltRoad" jdbcType="INTEGER" />
+    <result column="ROAD_NUM" property="roadNum" jdbcType="INTEGER" />
+    <result column="road_sect_limit" property="roadSectLimit" jdbcType="INTEGER" />
+    <result column="stand_axle_load" property="standAxleLoad" jdbcType="INTEGER" />
+    <result column="ROADRAILWAY_ID" property="roadrailwayId" jdbcType="VARCHAR" />
+    <result column="own_area" property="ownArea" jdbcType="VARCHAR" />
+  </resultMap>
+  <resultMap id="ResultMapWithBLOBs" type="com.Section.model.DataSection" extends="BaseResultMap" >
+    <result column="line_points" property="linePoints" jdbcType="LONGVARCHAR" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, START_LONGTUDE, START_LATITUDE, END_LONGTUDE, END_LATITUDE, MILES, SETION_TYPE, 
+    sect_avg_speed, is_asphalt_road, ROAD_NUM, road_sect_limit, stand_axle_load, ROADRAILWAY_ID, 
+    own_area
+  </sql>
+  <sql id="Blob_Column_List" >
+    line_points
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from pub_data_section
+    where ID = #{id,jdbcType=INTEGER}
+  </select>
+  
+  <select id="selectAllSection" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from pub_data_section
+  </select>
+  
+  <select id="getSectionHaveRoad" resultMap="ResultMapWithBLOBs" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from pub_data_section where ROADRAILWAY_ID is not null
+  </select>
+  
+  <select id="isHaveSection" parameterType="com.Section.model.DataSection" resultMap="ResultMapWithBLOBs" >
+  	select 
+    <include refid="Base_Column_List" />
+    from pub_data_section  
+  	where 
+  	START_LONGTUDE = #{startLongtude,jdbcType=DOUBLE} and 
+  	START_LATITUDE = #{startLatitude,jdbcType=DOUBLE} and 
+  	END_LONGTUDE = #{endLongtude,jdbcType=DOUBLE} and 
+  	END_LATITUDE = #{endLatitude,jdbcType=DOUBLE} and 
+  	MILES = #{miles,jdbcType=DOUBLE}
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from pub_data_section
+    where ID = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.Section.model.DataSection" useGeneratedKeys="true"  keyProperty="id">
+    insert into pub_data_section (ID, START_LONGTUDE, START_LATITUDE, 
+      END_LONGTUDE, END_LATITUDE, MILES, 
+      SETION_TYPE, sect_avg_speed, is_asphalt_road, 
+      ROAD_NUM, road_sect_limit, stand_axle_load, 
+      ROADRAILWAY_ID, own_area, line_points
+      )
+    values (#{id,jdbcType=INTEGER}, #{startLongtude,jdbcType=DOUBLE}, #{startLatitude,jdbcType=DOUBLE}, 
+      #{endLongtude,jdbcType=DOUBLE}, #{endLatitude,jdbcType=DOUBLE}, #{miles,jdbcType=DOUBLE}, 
+      #{setionType,jdbcType=VARCHAR}, #{sectAvgSpeed,jdbcType=INTEGER}, #{isAsphaltRoad,jdbcType=INTEGER}, 
+      #{roadNum,jdbcType=INTEGER}, #{roadSectLimit,jdbcType=INTEGER}, #{standAxleLoad,jdbcType=INTEGER}, 
+      #{roadrailwayId,jdbcType=VARCHAR}, #{ownArea,jdbcType=VARCHAR}, #{linePoints,jdbcType=LONGVARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.Section.model.DataSection" useGeneratedKeys="true"  keyProperty="id">
+    insert into pub_data_section
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="startLongtude != null" >
+        START_LONGTUDE,
+      </if>
+      <if test="startLatitude != null" >
+        START_LATITUDE,
+      </if>
+      <if test="endLongtude != null" >
+        END_LONGTUDE,
+      </if>
+      <if test="endLatitude != null" >
+        END_LATITUDE,
+      </if>
+      <if test="miles != null" >
+        MILES,
+      </if>
+      <if test="setionType != null" >
+        SETION_TYPE,
+      </if>
+      <if test="sectAvgSpeed != null" >
+        sect_avg_speed,
+      </if>
+      <if test="isAsphaltRoad != null" >
+        is_asphalt_road,
+      </if>
+      <if test="roadNum != null" >
+        ROAD_NUM,
+      </if>
+      <if test="roadSectLimit != null" >
+        road_sect_limit,
+      </if>
+      <if test="standAxleLoad != null" >
+        stand_axle_load,
+      </if>
+      <if test="roadrailwayId != null" >
+        ROADRAILWAY_ID,
+      </if>
+      <if test="ownArea != null" >
+        own_area,
+      </if>
+      <if test="linePoints != null" >
+        line_points,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="startLongtude != null" >
+        #{startLongtude,jdbcType=DOUBLE},
+      </if>
+      <if test="startLatitude != null" >
+        #{startLatitude,jdbcType=DOUBLE},
+      </if>
+      <if test="endLongtude != null" >
+        #{endLongtude,jdbcType=DOUBLE},
+      </if>
+      <if test="endLatitude != null" >
+        #{endLatitude,jdbcType=DOUBLE},
+      </if>
+      <if test="miles != null" >
+        #{miles,jdbcType=DOUBLE},
+      </if>
+      <if test="setionType != null" >
+        #{setionType,jdbcType=VARCHAR},
+      </if>
+      <if test="sectAvgSpeed != null" >
+        #{sectAvgSpeed,jdbcType=INTEGER},
+      </if>
+      <if test="isAsphaltRoad != null" >
+        #{isAsphaltRoad,jdbcType=INTEGER},
+      </if>
+      <if test="roadNum != null" >
+        #{roadNum,jdbcType=INTEGER},
+      </if>
+      <if test="roadSectLimit != null" >
+        #{roadSectLimit,jdbcType=INTEGER},
+      </if>
+      <if test="standAxleLoad != null" >
+        #{standAxleLoad,jdbcType=INTEGER},
+      </if>
+      <if test="roadrailwayId != null" >
+        #{roadrailwayId,jdbcType=VARCHAR},
+      </if>
+      <if test="ownArea != null" >
+        #{ownArea,jdbcType=VARCHAR},
+      </if>
+      <if test="linePoints != null" >
+        #{linePoints,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.Section.model.DataSection" >
+    update pub_data_section
+    <set >
+      <if test="startLongtude != null" >
+        START_LONGTUDE = #{startLongtude,jdbcType=DOUBLE},
+      </if>
+      <if test="startLatitude != null" >
+        START_LATITUDE = #{startLatitude,jdbcType=DOUBLE},
+      </if>
+      <if test="endLongtude != null" >
+        END_LONGTUDE = #{endLongtude,jdbcType=DOUBLE},
+      </if>
+      <if test="endLatitude != null" >
+        END_LATITUDE = #{endLatitude,jdbcType=DOUBLE},
+      </if>
+      <if test="miles != null" >
+        MILES = #{miles,jdbcType=DOUBLE},
+      </if>
+      <if test="setionType != null" >
+        SETION_TYPE = #{setionType,jdbcType=VARCHAR},
+      </if>
+      <if test="sectAvgSpeed != null" >
+        sect_avg_speed = #{sectAvgSpeed,jdbcType=INTEGER},
+      </if>
+      <if test="isAsphaltRoad != null" >
+        is_asphalt_road = #{isAsphaltRoad,jdbcType=INTEGER},
+      </if>
+      <if test="roadNum != null" >
+        ROAD_NUM = #{roadNum,jdbcType=INTEGER},
+      </if>
+      <if test="roadSectLimit != null" >
+        road_sect_limit = #{roadSectLimit,jdbcType=INTEGER},
+      </if>
+      <if test="standAxleLoad != null" >
+        stand_axle_load = #{standAxleLoad,jdbcType=INTEGER},
+      </if>
+      <if test="roadrailwayId != null" >
+        ROADRAILWAY_ID = #{roadrailwayId,jdbcType=VARCHAR},
+      </if>
+      <if test="ownArea != null" >
+        own_area = #{ownArea,jdbcType=VARCHAR},
+      </if>
+      <if test="linePoints != null" >
+        line_points = #{linePoints,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.Section.model.DataSection" >
+    update pub_data_section
+    set START_LONGTUDE = #{startLongtude,jdbcType=DOUBLE},
+      START_LATITUDE = #{startLatitude,jdbcType=DOUBLE},
+      END_LONGTUDE = #{endLongtude,jdbcType=DOUBLE},
+      END_LATITUDE = #{endLatitude,jdbcType=DOUBLE},
+      MILES = #{miles,jdbcType=DOUBLE},
+      SETION_TYPE = #{setionType,jdbcType=VARCHAR},
+      sect_avg_speed = #{sectAvgSpeed,jdbcType=INTEGER},
+      is_asphalt_road = #{isAsphaltRoad,jdbcType=INTEGER},
+      ROAD_NUM = #{roadNum,jdbcType=INTEGER},
+      road_sect_limit = #{roadSectLimit,jdbcType=INTEGER},
+      stand_axle_load = #{standAxleLoad,jdbcType=INTEGER},
+      ROADRAILWAY_ID = #{roadrailwayId,jdbcType=VARCHAR},
+      own_area = #{ownArea,jdbcType=VARCHAR},
+      line_points = #{linePoints,jdbcType=LONGVARCHAR}
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.Section.model.DataSection" >
+    update pub_data_section
+    set START_LONGTUDE = #{startLongtude,jdbcType=DOUBLE},
+      START_LATITUDE = #{startLatitude,jdbcType=DOUBLE},
+      END_LONGTUDE = #{endLongtude,jdbcType=DOUBLE},
+      END_LATITUDE = #{endLatitude,jdbcType=DOUBLE},
+      MILES = #{miles,jdbcType=DOUBLE},
+      SETION_TYPE = #{setionType,jdbcType=VARCHAR},
+      sect_avg_speed = #{sectAvgSpeed,jdbcType=INTEGER},
+      is_asphalt_road = #{isAsphaltRoad,jdbcType=INTEGER},
+      ROAD_NUM = #{roadNum,jdbcType=INTEGER},
+      road_sect_limit = #{roadSectLimit,jdbcType=INTEGER},
+      stand_axle_load = #{standAxleLoad,jdbcType=INTEGER},
+      ROADRAILWAY_ID = #{roadrailwayId,jdbcType=VARCHAR},
+      own_area = #{ownArea,jdbcType=VARCHAR}
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

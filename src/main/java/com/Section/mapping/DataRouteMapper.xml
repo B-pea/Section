@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.Section.dao.DataRouteMapper" >
+  <resultMap id="BaseResultMap" type="com.Section.model.DataRoute" >
+    <id column="ID" property="id" jdbcType="INTEGER" />
+    <result column="START_SITE" property="startSite" jdbcType="VARCHAR" />
+    <result column="START_LONGTUDE" property="startLongtude" jdbcType="DOUBLE" />
+    <result column="START_LATITUDE" property="startLatitude" jdbcType="DOUBLE" />
+    <result column="END_SITE" property="endSite" jdbcType="VARCHAR" />
+    <result column="END_LONGTUDE" property="endLongtude" jdbcType="DOUBLE" />
+    <result column="END_LATITUDE" property="endLatitude" jdbcType="DOUBLE" />
+    <result column="ROAD_SETIONS" property="roadSetions" jdbcType="VARCHAR" />
+    <result column="MILES" property="miles" jdbcType="DOUBLE" />
+    <result column="TYPE" property="type" jdbcType="VARCHAR" />
+    <result column="road_avg_speed" property="roadAvgSpeed" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    ID, START_SITE, START_LONGTUDE, START_LATITUDE, END_SITE, END_LONGTUDE, END_LATITUDE, 
+    ROAD_SETIONS,MILES, TYPE, road_avg_speed
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from pub_data_route
+    where ID = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectBySiteCode" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  	select 
+    <include refid="Base_Column_List" />
+    from pub_data_route
+    where START_SITE = #{siteCode,jdbcType=VARCHAR}
+  </select>
+  <select id="getAll" resultMap="BaseResultMap" >
+  	select 
+    <include refid="Base_Column_List" />
+    from pub_data_route
+    where ROAD_SETIONS is NULL
+  </select>
+  <select id="getWhichNotFull" resultType="java.lang.String" >
+  	select START_SITE
+  	from pub_data_route group by START_SITE HAVING count(*) !=376;
+  </select>
+  <select id="getByStartEndSite" resultType="java.lang.Integer" parameterType="com.Section.model.DataRoute" >
+  	select count(*)
+  	from pub_data_route 
+  	where 
+  	START_SITE = #{startSite,jdbcType=VARCHAR} and 
+  	END_SITE = #{endSite,jdbcType=VARCHAR};
+  </select>
+  
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from pub_data_route
+    where ID = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByStartSite" parameterType="java.lang.String" >
+    delete from pub_data_route
+    where START_SITE = #{startSite,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.Section.model.DataRoute" useGeneratedKeys="true"  keyProperty="id">
+    insert into pub_data_route (ID, START_SITE, START_LONGTUDE, 
+      START_LATITUDE, END_SITE, END_LONGTUDE, 
+      END_LATITUDE, ROAD_SETIONS,MILES, TYPE, 
+      road_avg_speed)
+    values (#{id,jdbcType=INTEGER}, #{startSite,jdbcType=VARCHAR}, #{startLongtude,jdbcType=DOUBLE}, 
+      #{startLatitude,jdbcType=DOUBLE}, #{endSite,jdbcType=VARCHAR}, #{endLongtude,jdbcType=DOUBLE}, 
+      #{endLatitude,jdbcType=DOUBLE}, #{roadSetions,jdbcType=VARCHAR},#{miles,jdbcType=DOUBLE}, #{type,jdbcType=VARCHAR}, 
+      #{roadAvgSpeed,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.Section.model.DataRoute" useGeneratedKeys="true"  keyProperty="id">
+    insert into pub_data_route
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        ID,
+      </if>
+      <if test="startSite != null" >
+        START_SITE,
+      </if>
+      <if test="startLongtude != null" >
+        START_LONGTUDE,
+      </if>
+      <if test="startLatitude != null" >
+        START_LATITUDE,
+      </if>
+      <if test="endSite != null" >
+        END_SITE,
+      </if>
+      <if test="endLongtude != null" >
+        END_LONGTUDE,
+      </if>
+      <if test="endLatitude != null" >
+        END_LATITUDE,
+      </if>
+      <if test="roadSetions != null" >
+        ROAD_SETIONS,
+      </if>
+      <if test="miles != null" >
+        MILES,
+      </if>
+      <if test="type != null" >
+        TYPE,
+      </if>
+      <if test="roadAvgSpeed != null" >
+        road_avg_speed,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="startSite != null" >
+        #{startSite,jdbcType=VARCHAR},
+      </if>
+      <if test="startLongtude != null" >
+        #{startLongtude,jdbcType=DOUBLE},
+      </if>
+      <if test="startLatitude != null" >
+        #{startLatitude,jdbcType=DOUBLE},
+      </if>
+      <if test="endSite != null" >
+        #{endSite,jdbcType=VARCHAR},
+      </if>
+      <if test="endLongtude != null" >
+        #{endLongtude,jdbcType=DOUBLE},
+      </if>
+      <if test="endLatitude != null" >
+        #{endLatitude,jdbcType=DOUBLE},
+      </if>
+      <if test="roadSetions != null" >
+        #{roadSetions,jdbcType=VARCHAR},
+      </if>
+      <if test="miles != null" >
+        #{miles,jdbcType=DOUBLE},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="roadAvgSpeed != null" >
+        #{roadAvgSpeed,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.Section.model.DataRoute" >
+    update pub_data_route
+    <set >
+      <if test="startSite != null" >
+        START_SITE = #{startSite,jdbcType=VARCHAR},
+      </if>
+      <if test="startLongtude != null" >
+        START_LONGTUDE = #{startLongtude,jdbcType=DOUBLE},
+      </if>
+      <if test="startLatitude != null" >
+        START_LATITUDE = #{startLatitude,jdbcType=DOUBLE},
+      </if>
+      <if test="endSite != null" >
+        END_SITE = #{endSite,jdbcType=VARCHAR},
+      </if>
+      <if test="endLongtude != null" >
+        END_LONGTUDE = #{endLongtude,jdbcType=DOUBLE},
+      </if>
+      <if test="endLatitude != null" >
+        END_LATITUDE = #{endLatitude,jdbcType=DOUBLE},
+      </if>
+      <if test="roadSetions != null" >
+        ROAD_SETIONS = #{roadSetions,jdbcType=VARCHAR},
+      </if>
+      <if test="miles != null" >
+        MILES = #{miles,jdbcType=DOUBLE},
+      </if>
+      <if test="type != null" >
+        TYPE = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="roadAvgSpeed != null" >
+        road_avg_speed = #{roadAvgSpeed,jdbcType=INTEGER},
+      </if>
+    </set>
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.Section.model.DataRoute" >
+    update pub_data_route
+    set START_SITE = #{startSite,jdbcType=VARCHAR},
+      START_LONGTUDE = #{startLongtude,jdbcType=DOUBLE},
+      START_LATITUDE = #{startLatitude,jdbcType=DOUBLE},
+      END_SITE = #{endSite,jdbcType=VARCHAR},
+      END_LONGTUDE = #{endLongtude,jdbcType=DOUBLE},
+      END_LATITUDE = #{endLatitude,jdbcType=DOUBLE},
+      ROAD_SETIONS = #{roadSetions,jdbcType=VARCHAR},
+      MILES = #{miles,jdbcType=DOUBLE},
+      TYPE = #{type,jdbcType=VARCHAR},
+      road_avg_speed = #{roadAvgSpeed,jdbcType=INTEGER}
+    where ID = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
